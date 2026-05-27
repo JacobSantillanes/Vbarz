@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VBARZ</title>
+    <link rel="stylesheet" href="index.css">
+    <!-- Google Fonts implementation for Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700;1,900&family=Modak&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- AGE GATE -->
+    <div id="age-gate" class="age-gate-overlay">
+        <div class="age-gate-modal">
+            <h1 class="brand-title">VBARZ</h1>
+            <p class="age-gate-text">Are you 21 or older?</p>
+            <div class="age-gate-buttons">
+                <button id="btn-yes" class="btn-primary">Yes, I am</button>
+                <button id="btn-no" class="btn-secondary">No</button>
+            </div>
+            <p class="age-gate-footer">By entering, you agree to our Terms of Service.</p>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT (Hidden until Age verified) -->
+    <div id="main-content" class="hidden">
+        <!-- NAVBAR -->
+        <nav class="navbar">
+            <div class="nav-brand" onclick="window.scrollTo(0,0)">VBARZ</div>
+            <div class="nav-links">
+                <a href="#menu">Menu</a>
+                <a href="#about">About</a>
+                <a href="#find-us">Find Us</a>
+            </div>
+            <div class="nav-icons">
+                <div class="cart-icon-wrapper" id="cart-icon-btn">
+                    <i data-lucide="shopping-cart"></i>
+                    <span class="cart-count hidden" id="cart-count">0</span>
+                </div>
+
+                <div class="mobile-menu-icon" id="mobile-menu-icon">
+                    <i data-lucide="menu"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar Overlay -->
+        <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
+
+        <!-- Sidebar Menu -->
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">VBARZ</span>
+                <button class="sidebar-close" id="sidebar-close" aria-label="Close menu">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Nav Links -->
+            <nav class="sidebar-nav">
+                <a href="#menu" class="sidebar-link" id="sl-menu">
+                    <i data-lucide="cannabis"></i> Menu
+                </a>
+                <a href="#about" class="sidebar-link" id="sl-about">
+                    <i data-lucide="info"></i> About
+                </a>
+                <a href="#find-us" class="sidebar-link" id="sl-find">
+                    <i data-lucide="map-pin"></i> Find Us
+                </a>
+            </nav>
+
+            <!-- Divider -->
+            <div class="sidebar-divider"></div>
+
+            <!-- Admin Login -->
+            <div class="sidebar-admin">
+                <p class="sidebar-admin-label">
+                    <i data-lucide="lock" style="width:13px;height:13px;vertical-align:middle;margin-right:4px"></i>
+                    Admin Access
+                </p>
+                <div id="admin-login-form">
+                    <input class="sidebar-input" type="text" id="sb-username" placeholder="Username" autocomplete="username">
+                    <input class="sidebar-input" type="password" id="sb-password" placeholder="Password" autocomplete="current-password">
+                    <button class="sidebar-login-btn" id="sb-login-btn">
+                        <i data-lucide="log-in" style="width:15px;height:15px"></i> Sign In to Dashboard
+                    </button>
+                    <p class="sidebar-login-error hidden" id="sb-login-error">Invalid credentials. Try again.</p>
+                </div>
+                <div id="admin-logged-in" class="hidden">
+                    <p class="sidebar-admin-welcome" id="sb-welcome-msg">Logged in as admin</p>
+                    <a href="/admin.html" class="sidebar-login-btn" style="text-decoration:none;justify-content:center">
+                        <i data-lucide="layout-dashboard" style="width:15px;height:15px"></i> Open CMS Dashboard
+                    </a>
+                    <button class="sidebar-logout-btn" id="sb-logout-btn">
+                        <i data-lucide="log-out" style="width:13px;height:13px"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HERO SECTION -->
+        <section class="hero" id="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-container">
+                <div class="hero-text fade-in-left">
+                    <span class="hero-subtitle">Premium Weed</span>
+                    <h1 class="hero-title">NOT YOUR<br><span class="text-red">AVERAGE</span><br>CEREAL BAR.</h1>
+                    <button class="btn-hero" onclick="window.location.href='#menu'">Shop the Collection</button>
+                </div>
+                <div class="hero-image-wrapper zoom-in">
+                    <div class="hero-image-outer">
+                        <div class="hero-image-inner">
+                            <img src="Gemini_Generated_Image_io2y2zio2y2zio2y.png" alt="VBarz Stash">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MENU SECTION -->
+        <section class="menu-section" id="menu">
+            <div class="menu-container">
+                <div class="menu-header">
+                    <div>
+                        <h2 class="menu-title">Menu</h2>
+                        <p class="menu-subtitle">Curated for the Bay Area</p>
+                    </div>
+                    <div class="menu-filters" id="category-filters">
+                        <button class="filter-btn active" data-category="All">All</button>
+                        <button class="filter-btn" data-category="Flower">Flower</button>
+                        <button class="filter-btn" data-category="Vapes">Carts/Disposables</button>
+                        <button class="filter-btn" data-category="Extras">Extras</button>
+                    </div>
+                </div>
+
+                <div class="products-grid" id="products-container">
+                    <!-- Products injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section class="about-section" id="about">
+            <div class="about-content">
+                <h2 class="about-title">Vibes & Sabores, Not Just a <span class="text-pink">Crop.</span></h2>
+                <p class="about-text">
+                    VBarz are cannabis-infused cereal bars made just for you. Inspired by other well known 420 Norcal
+                    companies. We don't just sell flower; we provide the fuel for your creative hustle.
+                </p>
+            </div>
+            <div class="about-watermark">VBARZ</div>
+        </section>
+
+        <!-- CART SIDEBAR -->
+        <div id="cart-overlay" class="cart-overlay hidden"></div>
+        <div id="cart-sidebar" class="cart-sidebar">
+            <div class="cart-header">
+                <h2>Your Bag</h2>
+                <i data-lucide="x" id="close-cart" class="close-cart-icon"></i>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <!-- Cart items injected by JS -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total-price">$0</span>
+                </div>
+                <button class="btn-checkout">Checkout</button>
+            </div>
+        </div>
+
+
+
+        <!-- FOOTER -->
+        <footer class="footer" id="find-us">
+            <div class="footer-container">
+                <div class="footer-brand-col">
+                    <h2 class="footer-brand">VBARZ</h2>
+                    <p class="footer-disclaimer">
+                        Always consume responsibly. Keep out of reach of children.
+                        The premier destination for premium adult-use cannabis products.
+                    </p>
+                </div>
+                <div class="footer-links-col">
+                    <h4 class="footer-heading">Find Us</h4>
+                    <div class="footer-info">
+                        <div><i data-lucide="map-pin" class="icon-small"></i> Bay Area & Surrounding Cities</div>
+                        <div><i data-lucide="clock" class="icon-small"></i> 10AM - 10PM DAILY</div>
+                    </div>
+                </div>
+                <div class="footer-social-col">
+                    <h4 class="footer-heading">Connect</h4>
+                    <div class="footer-social">
+                        <a href="https://instagram.com/Saboresgotsit" target="_blank" rel="noopener noreferrer"
+                            class="social-link">
+                            <i data-lucide="instagram"></i>
+                            <span>@Saboresgotsit</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                © 2024 VBARZ DISPENSARY. ALL RIGHTS RESERVED. FOR ADULT USE ONLY 21+.
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- Scripts -->
+    <script src="index.js"></script>
+    <script>
+        // Render all the Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

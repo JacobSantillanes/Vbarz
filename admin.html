@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VBARZ — Admin CMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Modak&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #0B0E14;
+            --surface: #111520;
+            --surface2: #181d2a;
+            --border: rgba(255,255,255,0.1);
+            --red: #FF0000;
+            --pink: #FF1493;
+            --purple: #A855F7;
+            --text: #ffffff;
+            --muted: rgba(255,255,255,0.5);
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        a { color: inherit; text-decoration: none; }
+
+        /* ── Login Screen ── */
+        #login-screen {
+            position: fixed; inset: 0; z-index: 200;
+            background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem;
+        }
+        .login-card {
+            width: 100%; max-width: 420px;
+            border: 3px solid var(--red);
+            background: #000;
+            padding: 2.5rem 2rem;
+            box-shadow: 8px 8px 0 var(--pink);
+        }
+        .login-logo {
+            font-family: 'Modak', cursive;
+            font-size: 3rem;
+            color: var(--red);
+            -webkit-text-stroke: 1px #5e1111;
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+        .login-sub { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: .8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: .65rem .85rem;
+            font-family: inherit;
+            font-size: .95rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--red); }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .form-select { appearance: none; cursor: pointer; }
+        .btn {
+            display: inline-flex; align-items: center; gap: .5rem;
+            padding: .65rem 1.4rem;
+            font-family: inherit; font-weight: 700; font-size: .9rem;
+            cursor: pointer; border: none; transition: opacity .2s, transform .1s;
+        }
+        .btn:active { transform: scale(.97); }
+        .btn-primary { background: var(--red); color: #fff; }
+        .btn-primary:hover { opacity: .85; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { opacity: .85; }
+        .btn-ghost { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+        .btn-ghost:hover { border-color: var(--red); color: var(--text); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-full { width: 100%; justify-content: center; }
+        #login-error { color: var(--danger); font-size: .85rem; margin-top: .75rem; display: none; text-align: center; }
+
+        /* ── App Layout ── */
+        #app { display: none; min-height: 100vh; }
+
+        /* Header */
+        .admin-header {
+            background: var(--surface);
+            border-bottom: 2px solid var(--red);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-logo { font-family: 'Modak', cursive; font-size: 1.6rem; color: var(--red); -webkit-text-stroke: 1px #5e1111; }
+        .header-title { font-size: .8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-left: .5rem; }
+        .header-left { display: flex; align-items: baseline; gap: .5rem; }
+        .header-right { display: flex; align-items: center; gap: 1rem; }
+
+        /* ── Main ── */
+        .admin-main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        /* Stats bar */
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem; margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface); border: 1.5px solid var(--border);
+            padding: 1.1rem 1.25rem;
+            border-left: 3px solid var(--red);
+        }
+        .stat-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+        .stat-value { font-size: 2rem; font-weight: 900; margin-top: .15rem; }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .toolbar-left { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+        .search-wrap { position: relative; }
+        .search-wrap .form-input { padding-left: 2.2rem; width: 260px; }
+        .search-icon { position: absolute; left: .65rem; top: 50%; transform: translateY(-50%); color: var(--muted); width: 16px; height: 16px; }
+        .filter-pills { display: flex; gap: .4rem; flex-wrap: wrap; }
+        .pill {
+            padding: .35rem .85rem; font-size: .8rem; font-weight: 600;
+            border: 1.5px solid var(--border); background: transparent;
+            color: var(--muted); cursor: pointer; font-family: inherit; transition: all .15s;
+        }
+        .pill.active, .pill:hover { border-color: var(--red); color: var(--text); }
+        .pill.active { background: rgba(255,0,0,0.1); }
+
+        /* Products Table */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { border-bottom: 2px solid var(--border); }
+        th {
+            text-align: left; padding: .75rem 1rem;
+            font-size: .72rem; color: var(--muted); text-transform: uppercase;
+            letter-spacing: .06em; font-weight: 600; white-space: nowrap;
+        }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:hover { background: var(--surface2); }
+        td { padding: .7rem 1rem; font-size: .9rem; vertical-align: middle; }
+        .product-thumb {
+            width: 52px; height: 52px; object-fit: cover;
+            border: 1.5px solid var(--border);
+        }
+        .product-thumb-placeholder {
+            width: 52px; height: 52px;
+            background: var(--surface2); border: 1.5px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--muted);
+        }
+        .badge {
+            display: inline-block; padding: .2rem .6rem;
+            font-size: .72rem; font-weight: 700;
+            border-radius: 0; letter-spacing: .03em;
+        }
+        .badge-flower { background: rgba(34,197,94,.15); color: #86efac; border: 1px solid rgba(34,197,94,.3); }
+        .badge-vapes { background: rgba(168,85,247,.15); color: #c4b5fd; border: 1px solid rgba(168,85,247,.3); }
+        .badge-extras { background: rgba(255,20,147,.15); color: #f9a8d4; border: 1px solid rgba(255,20,147,.3); }
+        .action-btns { display: flex; gap: .5rem; }
+        .icon-btn {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            border: 1.5px solid var(--border); background: transparent; color: var(--muted);
+            cursor: pointer; transition: all .15s;
+        }
+        .icon-btn:hover.edit { border-color: var(--purple); color: var(--purple); }
+        .icon-btn:hover.delete { border-color: var(--danger); color: var(--danger); }
+        .icon-btn svg { width: 15px; height: 15px; }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0,0,0,.75);
+            display: flex; align-items: flex-start; justify-content: center;
+            padding: 2rem 1rem;
+            overflow-y: auto;
+        }
+        .modal-overlay.hidden { display: none !important; }
+        .modal {
+            background: var(--surface);
+            border: 2px solid var(--red);
+            box-shadow: 6px 6px 0 var(--pink);
+            width: 100%; max-width: 680px;
+            padding: 2rem;
+            position: relative;
+        }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.75rem; padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-title { font-size: 1.2rem; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; color: var(--muted); cursor: pointer;
+            font-size: 1.4rem; line-height: 1; padding: .2rem;
+        }
+        .modal-close:hover { color: var(--text); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-hint { font-size: .75rem; color: var(--muted); margin-top: .35rem; }
+        .form-section-title {
+            font-size: .75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .06em; color: var(--pink);
+            margin: 1.5rem 0 .75rem;
+        }
+
+        /* Image upload zone */
+        .img-upload-zone {
+            border: 2px dashed var(--border);
+            padding: 1.5rem; text-align: center; cursor: pointer;
+            transition: border-color .2s;
+            position: relative;
+        }
+        .img-upload-zone:hover, .img-upload-zone.drag { border-color: var(--red); }
+        .img-upload-zone input[type=file] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+        }
+        .img-preview {
+            max-width: 100%; max-height: 160px; object-fit: contain;
+            margin: .75rem auto 0; display: block;
+            border: 1.5px solid var(--border);
+        }
+        .img-preview.hidden { display: none; }
+        .upload-hint { color: var(--muted); font-size: .82rem; }
+
+        /* Prices / Flavors builder */
+        .kv-list { display: flex; flex-direction: column; gap: .5rem; }
+        .kv-row { display: flex; gap: .5rem; align-items: center; }
+        .kv-row .form-input { flex: 1; }
+        .kv-remove { background: none; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; padding: .4rem .6rem; font-family: inherit; font-size: .8rem; }
+        .kv-remove:hover { border-color: var(--danger); color: var(--danger); }
+        .btn-add-kv { margin-top: .5rem; font-size: .8rem; background: none; border: 1.5px dashed var(--border); color: var(--muted); padding: .45rem 1rem; cursor: pointer; font-family: inherit; }
+        .btn-add-kv:hover { border-color: var(--pink); color: var(--text); }
+        .modal-footer { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.75rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+        /* Confirm dialog */
+        .confirm-overlay {
+            position: fixed; inset: 0; z-index: 400;
+            background: rgba(0,0,0,.8);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem;
+        }
+        .confirm-overlay.hidden { display: none !important; }
+        .confirm-card {
+            background: var(--surface); border: 2px solid var(--danger);
+            box-shadow: 4px 4px 0 var(--red);
+            padding: 2rem; max-width: 380px; width: 100%; text-align: center;
+        }
+        .confirm-card h3 { font-size: 1.1rem; margin-bottom: .75rem; }
+        .confirm-card p { color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem; }
+        .confirm-actions { display: flex; gap: .75rem; justify-content: center; }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 1.25rem; right: 1.25rem; z-index: 500; display: flex; flex-direction: column; gap: .5rem; }
+        .toast {
+            background: var(--surface2); border: 1.5px solid var(--border);
+            padding: .8rem 1.2rem; font-size: .88rem; font-weight: 500;
+            display: flex; align-items: center; gap: .6rem;
+            min-width: 240px; max-width: 320px;
+            animation: slide-in .2s ease;
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+        .toast-icon { width: 16px; height: 16px; flex-shrink: 0; }
+        @keyframes slide-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; opacity: .3; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .form-row { grid-template-columns: 1fr; }
+            .admin-main { padding: 1rem; }
+            .admin-header { padding: 0 1rem; }
+            .search-wrap .form-input { width: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">VBARZ</div>
+        <p class="login-sub">Admin Dashboard — Authorized Access Only</p>
+        <div class="form-group">
+            <label class="form-label">Username</label>
+            <input class="form-input" type="text" id="login-user" placeholder="admin" autocomplete="username">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Password</label>
+            <input class="form-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary btn-full" id="login-btn">
+            <i data-lucide="log-in" style="width:16px;height:16px"></i> Sign In
+        </button>
+        <p id="login-error">Invalid username or password.</p>
+    </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-left">
+            <span class="header-logo">VBARZ</span>
+            <span class="header-title">Admin CMS</span>
+        </div>
+        <div class="header-right">
+            <a href="/" class="btn btn-ghost" style="font-size:.8rem">
+                <i data-lucide="external-link" style="width:14px;height:14px"></i> View Site
+            </a>
+            <button class="btn btn-ghost" id="logout-btn" style="font-size:.8rem">
+                <i data-lucide="log-out" style="width:14px;height:14px"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <main class="admin-main">
+
+        <!-- Stats -->
+        <div class="stats-bar" id="stats-bar">
+            <div class="stat-card"><div class="stat-label">Total Products</div><div class="stat-value" id="stat-total">—</div></div>
+            <div class="stat-card" style="border-left-color:var(--success)"><div class="stat-label">Flower</div><div class="stat-value" id="stat-flower">—</div></div>
+            <div class="stat-card" style="border-left-color:var(--purple)"><div class="stat-label">Vapes</div><div class="stat-value" id="stat-vapes">—</div></div>
+            <div class="stat-card" style="border-left-color:var(--pink)"><div class="stat-label">Extras</div><div class="stat-value" id="stat-extras">—</div></div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <div class="search-wrap">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input class="form-input" type="search" id="search-input" placeholder="Search products…">
+                </div>
+                <div class="filter-pills" id="filter-pills">
+                    <button class="pill active" data-cat="All">All</button>
+                    <button class="pill" data-cat="Flower">Flower</button>
+                    <button class="pill" data-cat="Vapes">Vapes</button>
+                    <button class="pill" data-cat="Extras">Extras</button>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="add-btn">
+                <i data-lucide="plus" style="width:16px;height:16px"></i> Add Product
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Base Price</th>
+                        <th>Flavors</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="products-tbody"></tbody>
+            </table>
+            <div class="empty-state hidden" id="empty-state">
+                <i data-lucide="package-open"></i>
+                <p>No products found.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ── PRODUCT MODAL ── -->
+<div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title" id="modal-title">Add Product</span>
+            <button class="modal-close" id="modal-close">✕</button>
+        </div>
+
+        <form id="product-form" enctype="multipart/form-data">
+            <input type="hidden" id="edit-id">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Product Name *</label>
+                    <input class="form-input" type="text" id="f-name" placeholder="e.g. Blue Airheadz" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type *</label>
+                    <input class="form-input" type="text" id="f-type" placeholder="e.g. Flower, Cartridge, Wax" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select class="form-select form-input" id="f-category">
+                        <option value="Flower">Flower</option>
+                        <option value="Vapes">Vapes</option>
+                        <option value="Extras">Extras</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Base Price ($) *</label>
+                    <input class="form-input" type="number" id="f-price" min="0" step="0.01" placeholder="25" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Price Range Label <span style="color:var(--muted)">(optional)</span></label>
+                <input class="form-input" type="text" id="f-price-range" placeholder="e.g. Prices Range From $25-$30">
+            </div>
+
+            <div class="form-section-title">📸 Product Image</div>
+            <div class="img-upload-zone" id="img-zone">
+                <input type="file" id="f-image" accept="image/*">
+                <i data-lucide="image-plus" style="width:32px;height:32px;color:var(--muted);margin-bottom:.5rem"></i>
+                <p class="upload-hint">Click or drag an image here<br><small>JPG, PNG, WEBP, AVIF — max 10 MB</small></p>
+                <img class="img-preview hidden" id="img-preview" alt="Preview">
+            </div>
+            <input type="hidden" id="f-existing-img">
+
+            <div class="form-section-title">💰 Pricing Tiers</div>
+            <p class="form-hint" style="margin-bottom:.75rem">Add quantity/size options with their prices. Customers will see a dropdown.</p>
+            <div class="kv-list" id="prices-list"></div>
+            <button type="button" class="btn-add-kv" id="add-price-row">+ Add Price Tier</button>
+
+            <div class="form-section-title">🌿 Flavors / Strains <span style="font-weight:400;color:var(--muted)">(optional)</span></div>
+            <p class="form-hint" style="margin-bottom:.75rem">Add flavor names. You can leave the image field blank to use the product image.</p>
+            <div class="kv-list" id="flavors-list"></div>
+            <button type="button" class="btn-add-kv" id="add-flavor-row">+ Add Flavor</button>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" id="cancel-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="save-btn">
+                    <i data-lucide="save" style="width:15px;height:15px"></i> Save Product
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ── CONFIRM DELETE ── -->
+<div class="confirm-overlay hidden" id="confirm-overlay">
+    <div class="confirm-card">
+        <h3>Delete Product?</h3>
+        <p>This will permanently remove the product from your menu. This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+            <button class="btn btn-danger" id="confirm-delete">
+                <i data-lucide="trash-2" style="width:15px;height:15px"></i> Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── TOASTS ── -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let allProducts = [];
+let currentCat = 'All';
+let searchQuery = '';
+let deleteTargetId = null;
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+    const tc = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle-2' : 'alert-circle'}" class="toast-icon"></i><span>${msg}</span>`;
+    tc.appendChild(el);
+    if (window.lucide) lucide.createIcons({ nodes: [el] });
+    setTimeout(() => el.remove(), 3500);
+}
+
+// ── API helpers ───────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+    const opts = { method, credentials: 'include' };
+    if (body instanceof FormData) {
+        opts.body = body;
+    } else if (body) {
+        opts.headers = { 'Content-Type': 'application/json' };
+        opts.body = JSON.stringify(body);
+    }
+    const r = await fetch(path, opts);
+    if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || r.statusText); }
+    return r.json();
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+document.getElementById('login-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+
+document.getElementById('login-btn').addEventListener('click', async () => {
+    const u = document.getElementById('login-user').value.trim();
+    const p = document.getElementById('login-pass').value;
+    const err = document.getElementById('login-error');
+    err.style.display = 'none';
+    try {
+        await api('POST', '/api/login', { username: u, password: p });
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        loadProducts();
+    } catch {
+        err.style.display = 'block';
+    }
+});
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    await api('POST', '/api/logout');
+    location.reload();
+});
+
+// Check if already logged in
+(async () => {
+    const s = await api('GET', '/api/auth-status').catch(() => ({ authenticated: false }));
+    if (s.authenticated) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        loadProducts();
+    }
+})();
+
+// ── Products ──────────────────────────────────────────────────────────────────
+async function loadProducts() {
+    try {
+        allProducts = await api('GET', '/api/products');
+        renderStats();
+        renderTable();
+    } catch (e) {
+        toast('Failed to load products: ' + e.message, 'error');
+    }
+}
+
+function renderStats() {
+    document.getElementById('stat-total').textContent = allProducts.length;
+    document.getElementById('stat-flower').textContent = allProducts.filter(p => p.category === 'Flower').length;
+    document.getElementById('stat-vapes').textContent = allProducts.filter(p => p.category === 'Vapes').length;
+    document.getElementById('stat-extras').textContent = allProducts.filter(p => p.category === 'Extras').length;
+}
+
+function renderTable() {
+    const tbody = document.getElementById('products-tbody');
+    const emptyState = document.getElementById('empty-state');
+    const q = searchQuery.toLowerCase();
+
+    const filtered = allProducts.filter(p => {
+        const catMatch = currentCat === 'All' || p.category === currentCat;
+        const searchMatch = !q || p.name.toLowerCase().includes(q) || (p.type || '').toLowerCase().includes(q);
+        return catMatch && searchMatch;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons({ nodes: [emptyState] });
+        return;
+    }
+    emptyState.classList.add('hidden');
+
+    tbody.innerHTML = filtered.map(p => {
+        const catClass = p.category === 'Flower' ? 'badge-flower' : p.category === 'Vapes' ? 'badge-vapes' : 'badge-extras';
+        const img = p.img
+            ? `<img class="product-thumb" src="/${p.img}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            : '';
+        const placeholder = `<div class="product-thumb-placeholder" ${p.img ? 'style="display:none"' : ''}><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>`;
+        const flavorCount = p.flavors ? Object.keys(p.flavors).length : 0;
+        return `
+        <tr>
+            <td>${img}${placeholder}</td>
+            <td style="font-weight:600;max-width:220px">${p.name}</td>
+            <td style="color:var(--muted);font-size:.82rem">${p.type || ''}</td>
+            <td><span class="badge ${catClass}">${p.category}</span></td>
+            <td>$${p.price}</td>
+            <td style="color:var(--muted);font-size:.82rem">${flavorCount > 0 ? flavorCount + ' flavors' : '—'}</td>
+            <td>
+                <div class="action-btns">
+                    <button class="icon-btn edit" onclick="openEdit(${p.id})" title="Edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="icon-btn delete" onclick="confirmDelete(${p.id})" title="Delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+// Filter pills
+document.getElementById('filter-pills').addEventListener('click', e => {
+    if (!e.target.classList.contains('pill')) return;
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    e.target.classList.add('active');
+    currentCat = e.target.dataset.cat;
+    renderTable();
+});
+
+// Search
+document.getElementById('search-input').addEventListener('input', e => {
+    searchQuery = e.target.value;
+    renderTable();
+});
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+const modalOverlay = document.getElementById('modal-overlay');
+const modalTitle = document.getElementById('modal-title');
+
+function openModal() {
+    modalOverlay.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons({ nodes: [modalOverlay] });
+}
+function closeModal() { modalOverlay.classList.add('hidden'); }
+
+document.getElementById('add-btn').addEventListener('click', () => {
+    resetForm();
+    modalTitle.textContent = 'Add Product';
+    openModal();
+});
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('cancel-btn').addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+
+function resetForm() {
+    document.getElementById('edit-id').value = '';
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-type').value = '';
+    document.getElementById('f-category').value = 'Flower';
+    document.getElementById('f-price').value = '';
+    document.getElementById('f-price-range').value = '';
+    document.getElementById('f-image').value = '';
+    document.getElementById('f-existing-img').value = '';
+    document.getElementById('img-preview').src = '';
+    document.getElementById('img-preview').classList.add('hidden');
+    document.querySelector('.img-upload-zone p').style.display = '';
+    document.querySelector('.img-upload-zone [data-lucide]').style.display = '';
+    document.getElementById('prices-list').innerHTML = '';
+    document.getElementById('flavors-list').innerHTML = '';
+}
+
+function openEdit(id) {
+    const p = allProducts.find(x => x.id === id);
+    if (!p) return;
+    resetForm();
+    modalTitle.textContent = 'Edit Product';
+    document.getElementById('edit-id').value = p.id;
+    document.getElementById('f-name').value = p.name;
+    document.getElementById('f-type').value = p.type || '';
+    document.getElementById('f-category').value = p.category || 'Flower';
+    document.getElementById('f-price').value = p.price;
+    document.getElementById('f-price-range').value = p.priceRange || '';
+    document.getElementById('f-existing-img').value = p.img || '';
+
+    if (p.img) {
+        const preview = document.getElementById('img-preview');
+        preview.src = '/' + p.img;
+        preview.classList.remove('hidden');
+        document.querySelector('.img-upload-zone p').style.display = 'none';
+        document.querySelector('.img-upload-zone [data-lucide]').style.display = 'none';
+    }
+
+    // Prices
+    if (p.prices) {
+        Object.entries(p.prices).forEach(([k, v]) => addPriceRow(k, v));
+    }
+    // Flavors
+    if (p.flavors) {
+        Object.entries(p.flavors).forEach(([k, v]) => addFlavorRow(k, v));
+    }
+
+    openModal();
+}
+
+// ── KV Rows (prices / flavors) ────────────────────────────────────────────────
+function addPriceRow(key = '', val = '') {
+    const list = document.getElementById('prices-list');
+    const row = document.createElement('div');
+    row.className = 'kv-row';
+    row.innerHTML = `
+        <input class="form-input price-key" type="text" placeholder="Size (e.g. 1/8 oz)" value="${escHtml(key)}">
+        <input class="form-input price-val" type="number" min="0" step="0.01" placeholder="Price" value="${val}">
+        <button type="button" class="kv-remove" onclick="this.parentElement.remove()">✕</button>`;
+    list.appendChild(row);
+}
+function addFlavorRow(key = '', val = '') {
+    const list = document.getElementById('flavors-list');
+    const row = document.createElement('div');
+    row.className = 'kv-row';
+    row.innerHTML = `
+        <input class="form-input flavor-key" type="text" placeholder="Flavor name" value="${escHtml(key)}">
+        <input class="form-input flavor-val" type="text" placeholder="Image filename (optional)" value="${escHtml(val)}">
+        <button type="button" class="kv-remove" onclick="this.parentElement.remove()">✕</button>`;
+    list.appendChild(row);
+}
+document.getElementById('add-price-row').addEventListener('click', () => addPriceRow());
+document.getElementById('add-flavor-row').addEventListener('click', () => addFlavorRow());
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Image Preview ─────────────────────────────────────────────────────────────
+document.getElementById('f-image').addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        const preview = document.getElementById('img-preview');
+        preview.src = e.target.result;
+        preview.classList.remove('hidden');
+        document.querySelector('.img-upload-zone p').style.display = 'none';
+        document.querySelector('.img-upload-zone [data-lucide]').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+});
+
+// Drag and drop
+const imgZone = document.getElementById('img-zone');
+imgZone.addEventListener('dragover', e => { e.preventDefault(); imgZone.classList.add('drag'); });
+imgZone.addEventListener('dragleave', () => imgZone.classList.remove('drag'));
+imgZone.addEventListener('drop', e => {
+    e.preventDefault(); imgZone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('f-image').files = dt.files;
+    document.getElementById('f-image').dispatchEvent(new Event('change'));
+});
+
+// ── Form Submit ───────────────────────────────────────────────────────────────
+document.getElementById('product-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    try {
+        const id = document.getElementById('edit-id').value;
+        const fd = new FormData();
+        fd.append('name', document.getElementById('f-name').value.trim());
+        fd.append('type', document.getElementById('f-type').value.trim());
+        fd.append('category', document.getElementById('f-category').value);
+        fd.append('price', document.getElementById('f-price').value);
+        fd.append('priceRange', document.getElementById('f-price-range').value.trim());
+        fd.append('existingImg', document.getElementById('f-existing-img').value);
+
+        const imgFile = document.getElementById('f-image').files[0];
+        if (imgFile) fd.append('image', imgFile);
+
+        // Collect prices
+        const prices = {};
+        document.querySelectorAll('#prices-list .kv-row').forEach(row => {
+            const k = row.querySelector('.price-key').value.trim();
+            const v = parseFloat(row.querySelector('.price-val').value);
+            if (k && !isNaN(v)) prices[k] = v;
+        });
+        fd.append('prices', JSON.stringify(prices));
+
+        // Collect flavors
+        const flavors = {};
+        document.querySelectorAll('#flavors-list .kv-row').forEach(row => {
+            const k = row.querySelector('.flavor-key').value.trim();
+            const v = row.querySelector('.flavor-val').value.trim();
+            if (k) flavors[k] = v;
+        });
+        fd.append('flavors', JSON.stringify(Object.keys(flavors).length ? flavors : null));
+
+        if (id) {
+            await fetch(`/api/products/${id}`, { method: 'PUT', body: fd, credentials: 'include' }).then(r => r.json());
+            toast('Product updated successfully!');
+        } else {
+            await fetch('/api/products', { method: 'POST', body: fd, credentials: 'include' }).then(r => r.json());
+            toast('Product added to menu!');
+        }
+
+        closeModal();
+        await loadProducts();
+    } catch (err) {
+        toast('Error: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="save" style="width:15px;height:15px"></i> Save Product';
+        if (window.lucide) lucide.createIcons({ nodes: [btn] });
+    }
+});
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+const confirmOverlay = document.getElementById('confirm-overlay');
+
+function confirmDelete(id) {
+    deleteTargetId = id;
+    confirmOverlay.classList.remove('hidden');
+}
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+    confirmOverlay.classList.add('hidden');
+    deleteTargetId = null;
+});
+document.getElementById('confirm-delete').addEventListener('click', async () => {
+    if (!deleteTargetId) return;
+    try {
+        await api('DELETE', `/api/products/${deleteTargetId}`);
+        toast('Product deleted.');
+        confirmOverlay.classList.add('hidden');
+        deleteTargetId = null;
+        await loadProducts();
+    } catch (err) {
+        toast('Error: ' + err.message, 'error');
+    }
+});
+
+// ── Init Icons ────────────────────────────────────────────────────────────────
+if (window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>
