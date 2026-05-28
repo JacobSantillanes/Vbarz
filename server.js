@@ -30,7 +30,11 @@ async function connectDB() {
         console.warn('⚠️  No MONGO_URI set — running in local file mode');
         return;
     }
-    const client = new MongoClient(MONGO_URI);
+    const client = new MongoClient(MONGO_URI, {
+        tls: true,
+        tlsAllowInvalidCertificates: true,
+        serverSelectionTimeoutMS: 10000,
+    });
     await client.connect();
     db = client.db('vbarz');
     console.log('✅ MongoDB connected');
