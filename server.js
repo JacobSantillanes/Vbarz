@@ -70,6 +70,13 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false, maxAge: 1000 * 60 * 60 * 8 }
 }));
+// Never cache JS files so updates reach all devices instantly
+app.use((req, res, next) => {
+    if (req.path.endsWith('.js')) {
+        res.setHeader('Cache-Control', 'no-store');
+    }
+    next();
+});
 app.use(express.static(__dirname));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
