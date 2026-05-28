@@ -1,13 +1,10 @@
-// Fix SSL handshake issues with MongoDB Atlas on Render
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 const express = require('express');
 const session = require('express-session');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
-const { MongoClient, ObjectId } = require('mongodb');
+const { createClient } = require('@supabase/supabase-js');
 const cloudinary = require('cloudinary').v2;
 
 const app = express();
@@ -17,42 +14,26 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD_HASH = bcrypt.hashSync('vbarz2024', 10);
 
-// ── Cloudinary config (set via env vars on Render) ────────────────────────────
+// ── Supabase (uses HTTPS — no SSL socket issues) ──────────────────────────────
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+let supabase = null;
+
+if (SUPABASE_URL && SUPABASE_KEY) {
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✅ Supabase client ready');
+} else {
+    console.warn('⚠️  No Supabase env vars — running in local file mode');
+}
+
+// ── Cloudinary ────────────────────────────────────────────────────────────────
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key:    process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ── MongoDB ───────────────────────────────────────────────────────────────────
-const MONGO_URI = process.env.MONGO_URI;
-let db;
-
-async function connectDB() {
-    if (!MONGO_URI) {
-        console.warn('⚠️  No MONGO_URI set — running in local file mode');
-        return;
-    }
-    const client = new MongoClient(MONGO_URI, {
-        serverSelectionTimeoutMS: 10000,
-    });
-    await client.connect();
-    db = client.db('vbarz');
-    console.log('✅ MongoDB connected');
-
-    // Seed from products.json if collection is empty
-    const count = await db.collection('products').countDocuments();
-    if (count === 0) {
-        const productsFile = path.join(__dirname, 'products.json');
-        if (fs.existsSync(productsFile)) {
-            const products = JSON.parse(fs.readFileSync(productsFile, 'utf8'));
-            await db.collection('products').insertMany(products);
-            console.log(`✅ Seeded ${products.length} products from products.json`);
-        }
-    }
-}
-
-// ── Multer — memory storage (files go to Cloudinary, not disk) ────────────────
+// ── Multer ────────────────────────────────────────────────────────────────────
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 },
@@ -71,18 +52,15 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false, maxAge: 1000 * 60 * 60 * 8 }
 }));
+
 // Never cache JS files so updates reach all devices instantly
 app.use((req, res, next) => {
-    if (req.path.endsWith('.js')) {
-        res.setHeader('Cache-Control', 'no-store');
-    }
+    if (req.path.endsWith('.js')) res.setHeader('Cache-Control', 'no-store');
     next();
 });
 app.use(express.static(__dirname));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-// Upload a buffer to Cloudinary and return the secure URL
 function uploadToCloudinary(buffer, filename) {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -93,17 +71,64 @@ function uploadToCloudinary(buffer, filename) {
     });
 }
 
-// Fallback: read/write products.json when no MongoDB
+// Local file fallback
 const PRODUCTS_FILE = path.join(__dirname, 'products.json');
 const readLocal  = () => JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf8'));
 const writeLocal = (p) => fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(p, null, 2));
+
+// Supabase helpers
+async function dbGetAll() {
+    const { data, error } = await supabase
+        .from('products')
+        .select('data')
+        .order('id', { ascending: true });
+    if (error) throw error;
+    return data.map(row => row.data);
+}
+
+async function dbInsert(product) {
+    const { error } = await supabase
+        .from('products')
+        .insert({ id: product.id, data: product });
+    if (error) throw error;
+}
+
+async function dbUpdate(id, product) {
+    const { error } = await supabase
+        .from('products')
+        .update({ data: product })
+        .eq('id', id);
+    if (error) throw error;
+}
+
+async function dbDelete(id) {
+    const { data, error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id)
+        .select();
+    if (error) throw error;
+    return data.length > 0;
+}
+
+async function dbSeedIfEmpty() {
+    const { count, error } = await supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true });
+    if (error || count > 0) return;
+    const products = readLocal();
+    for (const p of products) {
+        await supabase.from('products').insert({ id: p.id, data: p });
+    }
+    console.log(`✅ Seeded ${products.length} products into Supabase`);
+}
 
 const requireAuth = (req, res, next) => {
     if (req.session && req.session.admin) return next();
     res.status(401).json({ error: 'Unauthorized' });
 };
 
-// ── Auth routes ───────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────────────
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (username === ADMIN_USERNAME && bcrypt.compareSync(password, ADMIN_PASSWORD_HASH)) {
@@ -124,14 +149,10 @@ app.get('/api/auth-status', (req, res) => {
 });
 
 // ── Products API ──────────────────────────────────────────────────────────────
-
-// GET all products (public)
 app.get('/api/products', async (req, res) => {
     try {
-        if (db) {
-            const products = await db.collection('products').find({}).sort({ id: 1 }).toArray();
-            // Remove internal _id from response
-            res.json(products.map(({ _id, ...p }) => p));
+        if (supabase) {
+            res.json(await dbGetAll());
         } else {
             res.json(readLocal());
         }
@@ -140,7 +161,6 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// POST create product (admin)
 app.post('/api/products', requireAuth, upload.single('image'), async (req, res) => {
     try {
         const body = req.body;
@@ -149,19 +169,17 @@ app.post('/api/products', requireAuth, upload.single('image'), async (req, res) 
         let flavors;
         try { const f = JSON.parse(body.flavors || 'null'); if (f && Object.keys(f).length) flavors = f; } catch {}
 
-        // Upload image to Cloudinary if provided
         let imgUrl = body.existingImg || '';
         if (req.file && process.env.CLOUDINARY_CLOUD_NAME) {
             imgUrl = await uploadToCloudinary(req.file.buffer, req.file.originalname);
         } else if (req.file) {
-            // Fallback: save locally
             const filename = `${path.parse(req.file.originalname).name}_${Date.now()}${path.extname(req.file.originalname)}`;
             fs.writeFileSync(path.join(__dirname, filename), req.file.buffer);
             imgUrl = filename;
         }
 
         const newProduct = {
-            id: Date.now(), // unique numeric id
+            id: Date.now(),
             name: body.name,
             type: body.type || 'Flower',
             category: body.category || 'Flower',
@@ -172,8 +190,8 @@ app.post('/api/products', requireAuth, upload.single('image'), async (req, res) 
         if (flavors) newProduct.flavors = flavors;
         if (body.priceRange) newProduct.priceRange = body.priceRange;
 
-        if (db) {
-            await db.collection('products').insertOne(newProduct);
+        if (supabase) {
+            await dbInsert(newProduct);
         } else {
             const products = readLocal();
             const maxId = products.reduce((m, p) => Math.max(m, p.id || 0), 0);
@@ -187,7 +205,6 @@ app.post('/api/products', requireAuth, upload.single('image'), async (req, res) 
     }
 });
 
-// PUT update product (admin)
 app.put('/api/products/:id', requireAuth, upload.single('image'), async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -206,7 +223,8 @@ app.put('/api/products/:id', requireAuth, upload.single('image'), async (req, re
             imgUrl = filename;
         }
 
-        const update = {
+        const updated = {
+            id,
             name: body.name,
             type: body.type,
             category: body.category,
@@ -214,39 +232,30 @@ app.put('/api/products/:id', requireAuth, upload.single('image'), async (req, re
             prices,
             img: imgUrl,
         };
-        if (flavors !== undefined) update.flavors = flavors;
-        if (body.priceRange) update.priceRange = body.priceRange;
+        if (flavors) updated.flavors = flavors;
+        if (body.priceRange) updated.priceRange = body.priceRange;
 
-        if (db) {
-            const result = await db.collection('products').findOneAndUpdate(
-                { id },
-                { $set: update, $unset: flavors ? {} : { flavors: '' } },
-                { returnDocument: 'after' }
-            );
-            if (!result) return res.status(404).json({ error: 'Not found' });
-            const { _id, ...p } = result;
-            res.json(p);
+        if (supabase) {
+            await dbUpdate(id, updated);
         } else {
             const products = readLocal();
             const idx = products.findIndex(p => p.id === id);
             if (idx === -1) return res.status(404).json({ error: 'Not found' });
-            products[idx] = { ...products[idx], ...update };
-            if (!flavors) delete products[idx].flavors;
+            products[idx] = { ...products[idx], ...updated };
             writeLocal(products);
-            res.json(products[idx]);
         }
+        res.json(updated);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// DELETE product (admin)
 app.delete('/api/products/:id', requireAuth, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        if (db) {
-            const result = await db.collection('products').deleteOne({ id });
-            if (result.deletedCount === 0) return res.status(404).json({ error: 'Not found' });
+        if (supabase) {
+            const found = await dbDelete(id);
+            if (!found) return res.status(404).json({ error: 'Not found' });
         } else {
             const products = readLocal();
             const filtered = products.filter(p => p.id !== id);
@@ -259,15 +268,11 @@ app.delete('/api/products/:id', requireAuth, async (req, res) => {
     }
 });
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-connectDB().then(() => {
+// ── Seed on startup then listen ───────────────────────────────────────────────
+(async () => {
+    if (supabase) await dbSeedIfEmpty().catch(e => console.error('Seed error:', e.message));
     app.listen(PORT, () => {
-        console.log(`\n🔥 VBARZ server running at http://localhost:${PORT}`);
-        console.log(`🔐 Admin panel: http://localhost:${PORT}/admin.html\n`);
+        console.log(`\n🔥 VBARZ running at http://localhost:${PORT}`);
+        console.log(`🔐 Admin: http://localhost:${PORT}/admin.html\n`);
     });
-}).catch(err => {
-    console.error('DB connection failed:', err.message);
-    app.listen(PORT, () => {
-        console.log(`🔥 VBARZ running (no DB) at http://localhost:${PORT}`);
-    });
-});
+})();
