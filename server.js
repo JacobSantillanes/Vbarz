@@ -1,3 +1,6 @@
+// Fix SSL handshake issues with MongoDB Atlas on Render
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const express = require('express');
 const session = require('express-session');
 const multer = require('multer');
@@ -31,8 +34,6 @@ async function connectDB() {
         return;
     }
     const client = new MongoClient(MONGO_URI, {
-        tls: true,
-        tlsAllowInvalidCertificates: true,
         serverSelectionTimeoutMS: 10000,
     });
     await client.connect();
