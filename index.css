@@ -1197,6 +1197,32 @@ body {
     background-color: #000;
 }
 
+.checkout-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.12), rgba(255, 20, 147, 0.12));
+    border: 1px solid var(--primary-pink);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #fff;
+}
+
+.checkout-notice i {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: var(--primary-pink);
+    margin-top: 0.1rem;
+}
+
+.checkout-notice strong {
+    color: var(--primary-pink);
+}
+
 .cart-total {
     display: flex;
     justify-content: space-between;

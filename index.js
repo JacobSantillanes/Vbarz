@@ -419,6 +419,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
             if (cart.length > 0) {
+                alert('📸 Almost done!\n\nScreenshot your order summary and send it to @Saboresgotsit on Instagram to complete your purchase.\n\nWe\'ll redirect you to Instagram now.');
                 window.location.href = 'https://instagram.com/Saboresgotsit';
             } else {
                 alert('Your bag is empty!');
