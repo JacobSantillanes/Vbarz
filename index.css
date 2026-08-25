@@ -1,8 +1,9 @@
 :root {
-    --bg-color: #0B0E14;
+    --bg-color: #10143a;
     --text-color: #ffffff;
-    --primary-red: #FF0000;
-    --primary-pink: #FF1493;
+    --primary-red: #A81D2A;
+    --primary-yellow: #FFC107;
+    --primary-blue: #0033CC;
     --primary-purple: #A855F7;
     --border-color: rgba(255, 255, 255, 0.1);
 }
@@ -25,7 +26,7 @@ body {
 }
 
 ::selection {
-    background: var(--primary-pink);
+    background: var(--primary-yellow);
     color: #fff;
 }
 
@@ -37,8 +38,12 @@ body {
     color: var(--primary-red);
 }
 
-.text-pink {
-    color: var(--primary-pink);
+.text-yellow {
+    color: var(--primary-yellow);
+}
+
+.text-blue {
+    color: var(--primary-blue);
 }
 
 /* --- AGE GATE --- */
@@ -61,7 +66,7 @@ body {
     border: 4px solid var(--primary-red);
     padding: 1.5rem;
     background-color: #000;
-    box-shadow: 10px 10px 0px 0px var(--primary-pink);
+    box-shadow: 10px 10px 0px 0px var(--primary-yellow);
 }
 
 @media (min-width: 768px) {
@@ -74,17 +79,17 @@ body {
     font-family: 'Modak', cursive;
     font-size: 3.5rem;
     font-weight: 400;
-    color: var(--primary-red);
+    color: var(--primary-blue);
     margin-bottom: 1rem;
     letter-spacing: 0.02em;
-    -webkit-text-stroke: 1.5px #5e1111;
+    -webkit-text-stroke: 1.5px var(--primary-yellow);
     text-shadow:
-        1px 1px 0 #5e1111,
-        2px 2px 0 #5e1111,
-        3px 3px 0 #5e1111,
-        4px 4px 0 #5e1111,
-        5px 5px 0 #5e1111,
-        6px 6px 0 #5e1111;
+        1px 1px 0 var(--primary-yellow),
+        2px 2px 0 var(--primary-yellow),
+        3px 3px 0 var(--primary-yellow),
+        4px 4px 0 var(--primary-yellow),
+        5px 5px 0 var(--primary-yellow),
+        6px 6px 0 var(--primary-yellow);
     transform: rotate(-3deg);
     display: inline-block;
 }
@@ -131,7 +136,7 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-pink);
+    background-color: var(--primary-yellow);
     transform: scale(1.05);
 }
 
@@ -178,15 +183,15 @@ body {
     font-family: 'Modak', cursive;
     font-size: 2.25rem;
     font-weight: 400;
-    color: var(--primary-red);
+    color: var(--primary-blue);
     letter-spacing: 0.02em;
     cursor: pointer;
-    -webkit-text-stroke: 1.5px #5e1111;
+    -webkit-text-stroke: 1.5px var(--primary-yellow);
     text-shadow:
-        1px 1px 0 #5e1111,
-        2px 2px 0 #5e1111,
-        3px 3px 0 #5e1111,
-        4px 4px 0 #5e1111,
+        1px 1px 0 var(--primary-yellow),
+        2px 2px 0 var(--primary-yellow),
+        3px 3px 0 var(--primary-yellow),
+        4px 4px 0 var(--primary-yellow),
         6px 6px 4px rgba(0, 0, 0, 0.5);
     transform: rotate(-3deg);
     display: inline-block;
@@ -214,7 +219,7 @@ body {
 }
 
 .nav-links a:hover {
-    color: var(--primary-pink);
+    color: var(--primary-blue);
 }
 
 .nav-icons {
@@ -229,7 +234,7 @@ body {
 }
 
 .nav-icons i:hover {
-    color: var(--primary-pink);
+    color: var(--primary-blue);
 }
 
 /* Hamburger always visible on all screen sizes */
@@ -244,7 +249,7 @@ body {
     height: 28px;
 }
 .mobile-menu-icon:hover {
-    color: var(--primary-pink);
+    color: var(--primary-blue);
 }
 .mobile-menu-icon svg {
     pointer-events: none;
@@ -295,9 +300,9 @@ body {
 .sidebar-logo {
     font-family: 'Modak', cursive;
     font-size: 1.8rem;
-    color: var(--primary-red);
-    -webkit-text-stroke: 1px #5e1111;
-    text-shadow: 2px 2px 0 #5e1111, 4px 4px 3px rgba(0,0,0,0.4);
+    color: var(--primary-blue);
+    -webkit-text-stroke: 1px var(--primary-yellow);
+    text-shadow: 2px 2px 0 var(--primary-yellow), 4px 4px 3px rgba(0,0,0,0.4);
     transform: rotate(-2deg);
     display: inline-block;
 }
@@ -453,7 +458,7 @@ body {
     right: -10%;
     width: 500px;
     height: 500px;
-    background-color: var(--primary-purple);
+    background-color: var(--primary-blue);
     border-radius: 50%;
     filter: blur(120px);
     opacity: 0.2;
@@ -493,7 +498,7 @@ body {
 
 .hero-subtitle {
     display: block;
-    color: var(--primary-pink);
+    color: var(--primary-blue);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -566,7 +571,7 @@ body {
     width: 100%;
     aspect-ratio: 1 / 1;
     max-width: 500px;
-    background: linear-gradient(to bottom right, var(--primary-red), var(--primary-pink));
+    background: linear-gradient(to bottom right, var(--primary-red), var(--primary-yellow));
     border-radius: 50%;
     padding: 0.5rem;
 }
@@ -716,7 +721,7 @@ body {
 }
 
 .product-card:hover {
-    box-shadow: 10px 10px 0px 0px var(--primary-red);
+    box-shadow: 10px 10px 0px 0px var(--primary-blue);
 }
 
 .product-image-container {
@@ -750,7 +755,7 @@ body {
 }
 
 .badge-indica {
-    background-color: var(--primary-purple);
+    background-color: var(--primary-blue);
 }
 
 .badge-sativa {
@@ -758,7 +763,7 @@ body {
 }
 
 .badge-hybrid {
-    background-color: var(--primary-pink);
+    background-color: var(--primary-yellow);
 }
 
 .product-name {
@@ -809,7 +814,7 @@ body {
     padding: 0.75rem 2.5rem 0.75rem 1rem;
     background-color: var(--bg-color);
     color: #fff;
-    border: 2px solid var(--primary-pink);
+    border: 2px solid var(--primary-yellow);
     border-radius: 0;
     font-family: 'Inter', sans-serif;
     font-weight: 900;
@@ -834,7 +839,7 @@ body {
 .product-qty-wrapper::after {
     content: '▼';
     font-size: 0.8rem;
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
     position: absolute;
     right: 1rem;
     top: 50%;
@@ -990,7 +995,7 @@ body {
     font-weight: 900;
     text-transform: uppercase;
     margin-bottom: 1rem;
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .footer-info {
@@ -1032,7 +1037,7 @@ body {
 }
 
 .social-link:hover {
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .footer-social i {
@@ -1041,7 +1046,7 @@ body {
 }
 
 .footer-social i:hover {
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .footer-copyright {
@@ -1064,7 +1069,7 @@ body {
 }
 
 .cart-icon-wrapper i:hover {
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .cart-count {
@@ -1138,7 +1143,7 @@ body {
 }
 
 .close-cart-icon:hover {
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .cart-items {
@@ -1202,7 +1207,7 @@ body {
     align-items: flex-start;
     gap: 0.6rem;
     background: linear-gradient(135deg, rgba(255, 0, 0, 0.12), rgba(255, 20, 147, 0.12));
-    border: 1px solid var(--primary-pink);
+    border: 1px solid var(--primary-yellow);
     border-radius: 8px;
     padding: 0.85rem 1rem;
     margin-bottom: 1rem;
@@ -1215,12 +1220,12 @@ body {
     flex-shrink: 0;
     width: 18px;
     height: 18px;
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
     margin-top: 0.1rem;
 }
 
 .checkout-notice strong {
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .cart-total {
@@ -1244,7 +1249,7 @@ body {
 }
 
 .btn-checkout:hover {
-    background-color: var(--primary-pink);
+    background-color: var(--primary-yellow);
 }
 
 /* --- ADMIN --- */
@@ -1254,7 +1259,7 @@ body {
 }
 
 .admin-icon:hover {
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .admin-overlay {
@@ -1274,7 +1279,7 @@ body {
     max-width: 400px;
     background-color: var(--bg-color);
     border: 2px solid var(--primary-red);
-    box-shadow: 8px 8px 0px 0px var(--primary-pink);
+    box-shadow: 8px 8px 0px 0px var(--primary-yellow);
     z-index: 201;
 }
 
@@ -1299,7 +1304,7 @@ body {
 }
 
 .close-admin-icon:hover {
-    color: var(--primary-pink);
+    color: var(--primary-yellow);
 }
 
 .admin-modal-body {
@@ -1335,7 +1340,7 @@ body {
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: var(--primary-pink);
+    border-color: var(--primary-yellow);
 }
 
 .form-row {
@@ -1365,7 +1370,7 @@ body {
 }
 
 .btn-admin-login:hover {
-    background-color: var(--primary-pink);
+    background-color: var(--primary-yellow);
 }
 
 .btn-admin-add {
@@ -1374,7 +1379,7 @@ body {
 }
 
 .btn-admin-add:hover {
-    background-color: var(--primary-pink);
+    background-color: var(--primary-yellow);
 }
 
 .btn-admin-logout {
@@ -1487,7 +1492,7 @@ body {
 }
 
 .admin-search-input:focus {
-    border-color: var(--primary-pink);
+    border-color: var(--primary-yellow);
 }
 
 .admin-search-input::placeholder {
@@ -1517,7 +1522,7 @@ body {
 }
 
 .admin-filter-btn:hover {
-    border-color: var(--primary-pink);
+    border-color: var(--primary-yellow);
 }
 
 .admin-filter-btn.active {
@@ -1605,7 +1610,7 @@ body {
 }
 
 .btn-admin-edit:hover {
-    background-color: var(--primary-pink);
+    background-color: var(--primary-yellow);
 }
 
 .btn-admin-delete {
@@ -1614,7 +1619,7 @@ body {
 }
 
 .btn-admin-delete:hover {
-    background-color: var(--primary-pink);
+    background-color: var(--primary-yellow);
 }
 
 @media (max-width: 767px) {
