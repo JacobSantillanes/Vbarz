@@ -425,9 +425,9 @@
 
             <div class="form-section-title">📸 Product Image</div>
             <div class="img-upload-zone" id="img-zone">
-                <input type="file" id="f-image" accept="image/*">
+                <input type="file" id="f-image" accept="image/*,.heic,.heif,.webp,.avif,.png,.jpg,.jpeg,.gif,.svg,.bmp,.tiff">
                 <i data-lucide="image-plus" style="width:32px;height:32px;color:var(--muted);margin-bottom:.5rem"></i>
-                <p class="upload-hint">Click or drag an image here<br><small>JPG, PNG, WEBP, AVIF — max 10 MB</small></p>
+                <p class="upload-hint">Click or drag any picture here<br><small>HEIC, JPG, PNG, WEBP, AVIF, GIF, etc. — up to 50 MB</small></p>
                 <img class="img-preview hidden" id="img-preview" alt="Preview">
             </div>
             <input type="hidden" id="f-existing-img">
@@ -475,6 +475,14 @@ let allProducts = [];
 let currentCat = 'All';
 let searchQuery = '';
 let deleteTargetId = null;
+
+function getMediaSrc(src) {
+    if (!src) return '';
+    if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:') || src.startsWith('blob:')) {
+        return src;
+    }
+    return '/' + encodeURI(src.replace(/^\/+/, ''));
+}
 
 // ── Toast ──────────────────────────────────────────────────────────────────────
 function toast(msg, type = 'success') {
@@ -575,17 +583,18 @@ function renderTable() {
 
     tbody.innerHTML = filtered.map(p => {
         const catClass = p.category === 'Flower' ? 'badge-flower' : p.category === 'Vapes' ? 'badge-vapes' : 'badge-extras';
-        const img = p.img
-            ? `<img class="product-thumb" src="/${p.img}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        const imgSrc = getMediaSrc(p.img);
+        const img = imgSrc
+            ? `<img class="product-thumb" src="${imgSrc}" alt="${escHtml(p.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
             : '';
-        const placeholder = `<div class="product-thumb-placeholder" ${p.img ? 'style="display:none"' : ''}><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>`;
+        const placeholder = `<div class="product-thumb-placeholder" ${imgSrc ? 'style="display:none"' : ''}><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>`;
         const flavorCount = p.flavors ? Object.keys(p.flavors).length : 0;
         return `
         <tr>
             <td>${img}${placeholder}</td>
-            <td style="font-weight:600;max-width:220px">${p.name}</td>
-            <td style="color:var(--muted);font-size:.82rem">${p.type || ''}</td>
-            <td><span class="badge ${catClass}">${p.category}</span></td>
+            <td style="font-weight:600;max-width:220px">${escHtml(p.name)}</td>
+            <td style="color:var(--muted);font-size:.82rem">${escHtml(p.type || '')}</td>
+            <td><span class="badge ${catClass}">${escHtml(p.category)}</span></td>
             <td>$${p.price}</td>
             <td style="color:var(--muted);font-size:.82rem">${flavorCount > 0 ? flavorCount + ' flavors' : '—'}</td>
             <td>
@@ -668,7 +677,7 @@ function openEdit(id) {
 
     if (p.img) {
         const preview = document.getElementById('img-preview');
-        preview.src = '/' + p.img;
+        preview.src = getMediaSrc(p.img);
         preview.classList.remove('hidden');
         document.querySelector('.img-upload-zone p').style.display = 'none';
         document.querySelector('.img-upload-zone [data-lucide]').style.display = 'none';
@@ -710,21 +719,28 @@ function addFlavorRow(key = '', val = '') {
 document.getElementById('add-price-row').addEventListener('click', () => addPriceRow());
 document.getElementById('add-flavor-row').addEventListener('click', () => addFlavorRow());
 
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── Image Preview ─────────────────────────────────────────────────────────────
 document.getElementById('f-image').addEventListener('change', function() {
     const file = this.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        const preview = document.getElementById('img-preview');
-        preview.src = e.target.result;
+    const preview = document.getElementById('img-preview');
+    if (window.URL && window.URL.createObjectURL) {
+        preview.src = window.URL.createObjectURL(file);
         preview.classList.remove('hidden');
         document.querySelector('.img-upload-zone p').style.display = 'none';
         document.querySelector('.img-upload-zone [data-lucide]').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
+    } else {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            document.querySelector('.img-upload-zone p').style.display = 'none';
+            document.querySelector('.img-upload-zone [data-lucide]').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
 });
 
 // Drag and drop
@@ -734,7 +750,7 @@ imgZone.addEventListener('dragleave', () => imgZone.classList.remove('drag'));
 imgZone.addEventListener('drop', e => {
     e.preventDefault(); imgZone.classList.remove('drag');
     const file = e.dataTransfer.files[0];
-    if (!file || !file.type.startsWith('image/')) return;
+    if (!file) return;
     const dt = new DataTransfer();
     dt.items.add(file);
     document.getElementById('f-image').files = dt.files;

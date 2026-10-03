@@ -368,7 +368,15 @@ const DEFAULT_PRODUCTS = [
 
 ];
 
-let PRODUCTS = [];
+const PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400' width='100%25' height='100%25'%3E%3Crect width='400' height='400' fill='%23111520'/%3E%3Ccircle cx='200' cy='180' r='100' fill='%23181d2a' stroke='rgba(255,255,255,0.06)' stroke-width='2'/%3E%3Cpath d='M200,90 C190,140 145,175 105,185 C150,195 180,225 195,275 L200,300 L205,275 C220,225 250,195 295,185 C255,175 210,140 200,90 Z' fill='%23FF0000' opacity='0.85'/%3E%3Ctext x='200' y='340' font-family='sans-serif' font-weight='900' font-size='22' fill='rgba(255,255,255,0.7)' text-anchor='middle' letter-spacing='4'%3EVBARZ%3C/text%3E%3C/svg%3E";
+
+function getMediaSrc(src) {
+    if (!src) return '';
+    if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:') || src.startsWith('blob:')) {
+        return src;
+    }
+    return '/' + encodeURI(src.replace(/^\/+/, ''));
+}
 
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
@@ -433,10 +441,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         cart.forEach((item, index) => {
             total += item.price;
+            const itemImgSrc = getMediaSrc(item.img) || PLACEHOLDER_IMG;
             const cartItemEl = document.createElement('div');
             cartItemEl.className = 'cart-item';
             cartItemEl.innerHTML = `
-                <img src="${item.img}" alt="${item.name}" class="cart-item-img">
+                <img src="${itemImgSrc}" alt="${item.name}" class="cart-item-img" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
                 <div class="cart-item-info">
                     <div class="cart-item-title">${item.name}</div>
                     <div class="cart-item-price">$${item.price}</div>
@@ -610,11 +619,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `;
             }
 
+            const imgSrc = getMediaSrc(product.img) || PLACEHOLDER_IMG;
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
                 <div class="product-image-container">
-                    <img src="${product.img}" alt="${product.name}">
+                    <img src="${imgSrc}" alt="${product.name}" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
                     <span class="product-badge ${badgeClass}">${product.type}</span>
                 </div>
                 <h3 class="product-name">${product.name}</h3>
@@ -655,7 +665,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const product = PRODUCTS.find(p => p.id === productId);
             if (product && product.flavors) {
                 const flavor = e.target.value;
-                const newImg = product.flavors[flavor];
+                const rawImg = product.flavors[flavor] || product.img;
+                const newImg = getMediaSrc(rawImg) || PLACEHOLDER_IMG;
                 const card = e.target.closest('.product-card');
                 const imgEl = card.querySelector('.product-image-container img');
                 if (imgEl) {
@@ -691,7 +702,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (flavorSelect) {
                         const flavor = flavorSelect.value;
                         itemToAdd.name = `${itemToAdd.name} - ${flavor}`;
-                        itemToAdd.img = product.flavors[flavor];
+                        itemToAdd.img = product.flavors[flavor] || product.img;
                     }
                 }
 

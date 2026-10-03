@@ -7,8 +7,16 @@ const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const cloudinary = require('cloudinary').v2;
 
+const sharp = require('sharp');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Ensure uploads directory exists
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
 
 // ── Admin credentials ─────────────────────────────────────────────────────────
 const ADMIN_USERNAME = 'admin';
@@ -34,12 +42,13 @@ cloudinary.config({
 });
 
 // ── Multer ────────────────────────────────────────────────────────────────────
+// Allow any image / media upload up to 50MB
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 10 * 1024 * 1024 },
+    limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) cb(null, true);
-        else cb(new Error('Only image files allowed'));
+        // Accept any image or media file regardless of browser-reported mimetype
+        cb(null, true);
     }
 });
 
@@ -58,13 +67,89 @@ app.use((req, res, next) => {
     if (req.path.endsWith('.js')) res.setHeader('Cache-Control', 'no-store');
     next();
 });
+app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.static(__dirname));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+async function processAndOptimizeImage(buffer, originalname) {
+    const ext = (path.extname(originalname) || '').toLowerCase();
+    const cleanBase = path.parse(originalname).name.replace(/[^a-zA-Z0-9_-]/g, '_') || 'upload';
+
+    // SVG can be saved directly
+    if (ext === '.svg') {
+        const filename = `${cleanBase}_${Date.now()}.svg`;
+        return { buffer, filename, mime: 'image/svg+xml' };
+    }
+
+    try {
+        // Process any image format (HEIC, HEIF, PNG, JPG, WEBP, AVIF, TIFF, BMP, GIF, etc.)
+        // Resize to maximum 1200x1200 while preserving aspect ratio, auto-orient from EXIF, convert to optimized WebP
+        const optimizedBuffer = await sharp(buffer)
+            .rotate() // auto-orient based on EXIF
+            .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 84, effort: 4 })
+            .toBuffer();
+        const filename = `${cleanBase}_${Date.now()}.webp`;
+        return { buffer: optimizedBuffer, filename, mime: 'image/webp' };
+    } catch (err) {
+        console.warn('⚠️  Sharp conversion fallback for:', originalname, err.message);
+        const safeExt = ext || '.jpg';
+        const filename = `${cleanBase}_${Date.now()}${safeExt}`;
+        return { buffer, filename, mime: 'image/jpeg' };
+    }
+}
+
+async function saveUploadedMedia(fileBuffer, originalname) {
+    const { buffer, filename, mime } = await processAndOptimizeImage(fileBuffer, originalname);
+
+    // 1. If Cloudinary is configured, upload to Cloudinary
+    if (process.env.CLOUDINARY_CLOUD_NAME) {
+        try {
+            return await uploadToCloudinary(buffer, filename);
+        } catch (e) {
+            console.warn('Cloudinary upload error, falling back:', e.message);
+        }
+    }
+
+    // 2. If Supabase client is active, attempt Supabase Storage
+    if (supabase) {
+        try {
+            const bucketName = 'products';
+            const storagePath = `uploads/${Date.now()}_${filename}`;
+            const { data, error } = await supabase.storage
+                .from(bucketName)
+                .upload(storagePath, buffer, { contentType: mime, upsert: true });
+
+            if (!error && data) {
+                const { data: pub } = supabase.storage.from(bucketName).getPublicUrl(storagePath);
+                if (pub && pub.publicUrl) return pub.publicUrl;
+            }
+        } catch (e) {
+            console.warn('Supabase storage fallback:', e.message);
+        }
+    }
+
+    // 3. Save locally to disk
+    try {
+        fs.writeFileSync(path.join(UPLOADS_DIR, filename), buffer);
+        fs.writeFileSync(path.join(__dirname, filename), buffer);
+    } catch (e) {
+        console.warn('Local file write error:', e.message);
+    }
+
+    // 4. If Supabase DB is active (e.g. on Render without persistent disk),
+    // storing as a WebP Data URI ensures the image persists inside Supabase DB forever across container restarts!
+    if (supabase) {
+        return `data:${mime};base64,${buffer.toString('base64')}`;
+    }
+
+    return filename;
+}
+
 function uploadToCloudinary(buffer, filename) {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-            { folder: 'vbarz', public_id: path.parse(filename).name, overwrite: true },
+            { folder: 'vbarz', public_id: path.parse(filename).name, resource_type: 'auto', overwrite: true },
             (err, result) => err ? reject(err) : resolve(result.secure_url)
         );
         stream.end(buffer);
@@ -170,12 +255,8 @@ app.post('/api/products', requireAuth, upload.single('image'), async (req, res) 
         try { const f = JSON.parse(body.flavors || 'null'); if (f && Object.keys(f).length) flavors = f; } catch {}
 
         let imgUrl = body.existingImg || '';
-        if (req.file && process.env.CLOUDINARY_CLOUD_NAME) {
-            imgUrl = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-        } else if (req.file) {
-            const filename = `${path.parse(req.file.originalname).name}_${Date.now()}${path.extname(req.file.originalname)}`;
-            fs.writeFileSync(path.join(__dirname, filename), req.file.buffer);
-            imgUrl = filename;
+        if (req.file) {
+            imgUrl = await saveUploadedMedia(req.file.buffer, req.file.originalname);
         }
 
         const newProduct = {
@@ -201,6 +282,7 @@ app.post('/api/products', requireAuth, upload.single('image'), async (req, res) 
         }
         res.json(newProduct);
     } catch (err) {
+        console.error('Error adding product:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -215,12 +297,8 @@ app.put('/api/products/:id', requireAuth, upload.single('image'), async (req, re
         try { const f = JSON.parse(body.flavors || 'null'); if (f && Object.keys(f).length) flavors = f; } catch {}
 
         let imgUrl = body.existingImg || '';
-        if (req.file && process.env.CLOUDINARY_CLOUD_NAME) {
-            imgUrl = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-        } else if (req.file) {
-            const filename = `${path.parse(req.file.originalname).name}_${Date.now()}${path.extname(req.file.originalname)}`;
-            fs.writeFileSync(path.join(__dirname, filename), req.file.buffer);
-            imgUrl = filename;
+        if (req.file) {
+            imgUrl = await saveUploadedMedia(req.file.buffer, req.file.originalname);
         }
 
         const updated = {
@@ -246,6 +324,7 @@ app.put('/api/products/:id', requireAuth, upload.single('image'), async (req, re
         }
         res.json(updated);
     } catch (err) {
+        console.error('Error updating product:', err);
         res.status(500).json({ error: err.message });
     }
 });
