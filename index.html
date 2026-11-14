@@ -40,12 +40,17 @@
                         <i data-lucide="flame" class="icon-flame"></i>
                         <span id="banner-tagline">FLASH SALE</span>
                     </span>
+                    <img id="banner-product-img" class="sales-banner-thumb hidden" src="" alt="Featured deal item" onerror="this.classList.add('hidden')">
                     <div class="sales-banner-info">
-                        <strong class="sales-product-name" id="banner-product-name">Product Name</strong>
-                        <span class="sales-on-sale-text">on sale for</span>
-                        <span class="sales-price" id="banner-sale-price">$0</span>
-                        <del class="sales-original-price" id="banner-original-price">$0</del>
-                        <span class="sales-save-pill" id="banner-save-pill">Save $0</span>
+                        <div class="sales-banner-title-row">
+                            <strong class="sales-product-name" id="banner-product-name">Product Name</strong>
+                            <span class="sales-drop-tag">SPECIAL DROP</span>
+                        </div>
+                        <div class="sales-banner-price-row">
+                            <span class="sales-price" id="banner-sale-price">$0</span>
+                            <del class="sales-original-price" id="banner-original-price">$0</del>
+                            <span class="sales-save-pill" id="banner-save-pill">Save $0</span>
+                        </div>
                     </div>
                 </div>
                 <div class="sales-banner-right">
@@ -203,7 +208,8 @@
             <div class="cart-footer">
                 <div class="checkout-notice">
                     <i data-lucide="camera"></i>
-                    <span>Screenshot your order &amp; send it to <strong>@Vbarzzz</strong> on Instagram to complete your purchase!</span>
+                    <span>Screenshot your order &amp; send it to <strong>@Vbarzzz</strong> on Instagram to complete your
+                        purchase!</span>
                 </div>
                 <div class="cart-total">
                     <span>Total:</span>

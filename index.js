@@ -581,6 +581,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const salesBanner = document.getElementById('sales-banner');
     const bannerTagline = document.getElementById('banner-tagline');
     const bannerProductName = document.getElementById('banner-product-name');
+    const bannerProductImg = document.getElementById('banner-product-img');
     const bannerSalePrice = document.getElementById('banner-sale-price');
     const bannerOriginalPrice = document.getElementById('banner-original-price');
     const bannerSavePill = document.getElementById('banner-save-pill');
@@ -615,6 +616,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (bannerProductName) bannerProductName.textContent = sale.productName || 'Special Item';
                 if (bannerSalePrice) bannerSalePrice.textContent = `$${sale.discountedPrice}`;
                 if (bannerOriginalPrice) bannerOriginalPrice.textContent = `$${sale.originalPrice}`;
+
+                if (bannerProductImg) {
+                    const targetProduct = PRODUCTS.find(p => p.id === sale.productId);
+                    const productImg = sale.img || (targetProduct ? targetProduct.img : '');
+                    const imgSrc = getMediaSrc(productImg);
+                    if (imgSrc) {
+                        bannerProductImg.src = imgSrc;
+                        bannerProductImg.classList.remove('hidden');
+                        bannerProductImg.onload = () => updateBannerHeight();
+                    } else {
+                        bannerProductImg.classList.add('hidden');
+                    }
+                }
 
                 const savings = sale.originalPrice - sale.discountedPrice;
                 if (bannerSavePill) {
