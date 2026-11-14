@@ -168,6 +168,7 @@
         .badge-flower { background: rgba(34,197,94,.15); color: #86efac; border: 1px solid rgba(34,197,94,.3); }
         .badge-vapes { background: rgba(168,85,247,.15); color: #c4b5fd; border: 1px solid rgba(168,85,247,.3); }
         .badge-extras { background: rgba(255,20,147,.15); color: #f9a8d4; border: 1px solid rgba(255,20,147,.3); }
+        .badge-addon { background: rgba(255,193,7,.15); color: #fde047; border: 1px solid rgba(255,193,7,.3); }
         .action-btns { display: flex; gap: .5rem; }
         .icon-btn {
             width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
@@ -176,7 +177,183 @@
         }
         .icon-btn:hover.edit { border-color: var(--purple); color: var(--purple); }
         .icon-btn:hover.delete { border-color: var(--danger); color: var(--danger); }
+        .icon-btn:hover.sale { border-color: #FFC107; color: #FFC107; }
         .icon-btn svg { width: 15px; height: 15px; }
+
+        /* ── Sale Manager Card ── */
+        .sale-manager-card {
+            background: var(--surface);
+            border: 2px solid rgba(255, 193, 7, 0.4);
+            box-shadow: 6px 6px 0px rgba(255, 0, 0, 0.5);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .sale-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .sale-card-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sale-badge-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 193, 7, 0.15);
+            border: 1.5px solid #FFC107;
+            color: #FFC107;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .sale-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .sale-card-subtitle {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.15rem;
+        }
+        .sale-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .sale-status-badge.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1.5px solid rgba(34, 197, 94, 0.4);
+        }
+        .sale-status-badge.inactive {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--muted);
+            border: 1.5px solid var(--border);
+        }
+
+        /* Banner preview inside admin */
+        .sale-preview-container {
+            margin-bottom: 1.5rem;
+            background: #000;
+            border: 1.5px dashed rgba(255, 193, 7, 0.4);
+            padding: 0.75rem;
+        }
+        .sale-preview-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #FFC107;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .admin-live-banner {
+            background: linear-gradient(90deg, #090C14 0%, #1a0810 25%, #2a0b16 50%, #1a0810 75%, #090C14 100%);
+            border-bottom: 2px solid #FFC107;
+            padding: 0.65rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .alb-left {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .alb-badge {
+            background: var(--red);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            padding: 0.2rem 0.5rem;
+            border: 1px solid #FFC107;
+            text-transform: uppercase;
+        }
+        .alb-info {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.4rem;
+        }
+        .alb-name { font-weight: 800; color: #fff; }
+        .alb-price { color: #FFC107; font-weight: 900; font-size: 1.05rem; }
+        .alb-old { color: var(--muted); text-decoration: line-through; font-size: 0.8rem; }
+        .alb-save { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.4rem; }
+        .alb-btn {
+            background: #FFC107;
+            color: #000;
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 0.3rem 0.75rem;
+            border: none;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .sale-form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        @media (max-width: 900px) {
+            .sale-form-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 560px) {
+            .sale-form-grid { grid-template-columns: 1fr; }
+        }
+        .sale-calc-pill {
+            font-size: 0.75rem;
+            margin-top: 0.35rem;
+            color: #4ade80;
+            font-weight: 600;
+            min-height: 1.1rem;
+        }
+        .sale-actions-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .quota-warning-banner {
+            background: rgba(255, 193, 7, 0.12);
+            border: 1.5px solid #FFC107;
+            color: #fff;
+            padding: 0.85rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
 
         /* ── Modal ── */
         .modal-overlay {
@@ -296,11 +473,11 @@
         <p class="login-sub">Admin Dashboard — Authorized Access Only</p>
         <div class="form-group">
             <label class="form-label">Username</label>
-            <input class="form-input" type="text" id="login-user" placeholder="admin" autocomplete="username">
+            <input class="form-input" type="text" id="login-user" value="admin" placeholder="admin" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
         </div>
         <div class="form-group">
             <label class="form-label">Password</label>
-            <input class="form-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+            <input class="form-input" type="password" id="login-pass" placeholder="Enter password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
         </div>
         <button class="btn btn-primary btn-full" id="login-btn">
             <i data-lucide="log-in" style="width:16px;height:16px"></i> Sign In
@@ -319,6 +496,13 @@
             <span class="header-title">Admin CMS</span>
         </div>
         <div class="header-right">
+            <div id="cloud-status-pill" style="font-size:.75rem;padding:.25rem .65rem;border:1px solid rgba(255,255,255,0.2);display:inline-flex;align-items:center;gap:.35rem">
+                <span id="cloud-dot" style="width:7px;height:7px;border-radius:50%;background:#ef4444;display:inline-block"></span>
+                <span id="cloud-text" style="color:var(--muted)">Checking Cloud…</span>
+            </div>
+            <button class="btn btn-ghost" id="sync-cloud-btn" title="Sync local catalog to Supabase Pro" style="font-size:.8rem">
+                <i data-lucide="cloud-lightning" style="width:14px;height:14px"></i> <span id="sync-btn-label">Sync Supabase Pro</span>
+            </button>
             <a href="/" class="btn btn-ghost" style="font-size:.8rem">
                 <i data-lucide="external-link" style="width:14px;height:14px"></i> View Site
             </a>
@@ -330,12 +514,118 @@
 
     <main class="admin-main">
 
+        <!-- Quota Warning Notice (displayed if Supabase egress is exceeded) -->
+        <div id="quota-warning-banner" class="quota-warning-banner hidden">
+            <div style="display:flex;align-items:flex-start;gap:0.75rem">
+                <span style="font-size:1.35rem;line-height:1">⚠️</span>
+                <div>
+                    <strong style="color:#FFC107">Supabase Egress Quota Exceeded — Running in Local Fallback Mode</strong>
+                    <div style="font-size:0.82rem;color:rgba(255,255,255,0.75);margin-top:3px">
+                        Your Supabase project reached its monthly egress quota limit. The CMS is automatically serving and saving products to your local file (<code>products.json</code>) so you can continue using the dashboard uninterrupted.
+                        If you have upgraded to Pro, click <strong>Reconnect to Supabase Pro</strong> below to resume cloud sync.
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem">
+                <button type="button" class="btn btn-primary" id="banner-reconnect-btn" style="padding:0.35rem 0.8rem;font-size:0.75rem;background:#FFC107;color:#000;font-weight:700">
+                    <i data-lucide="refresh-cw" style="width:12px;height:12px"></i> Reconnect to Supabase Pro
+                </button>
+                <button type="button" class="btn btn-ghost" style="padding:0.3rem 0.7rem;font-size:0.75rem;border-color:rgba(255,193,7,0.4);color:#FFC107" onclick="document.getElementById('quota-warning-banner').classList.add('hidden')">Dismiss</button>
+            </div>
+        </div>
+
         <!-- Stats -->
         <div class="stats-bar" id="stats-bar">
             <div class="stat-card"><div class="stat-label">Total Products</div><div class="stat-value" id="stat-total">—</div></div>
             <div class="stat-card" style="border-left-color:var(--success)"><div class="stat-label">Flower</div><div class="stat-value" id="stat-flower">—</div></div>
             <div class="stat-card" style="border-left-color:var(--purple)"><div class="stat-label">Vapes</div><div class="stat-value" id="stat-vapes">—</div></div>
             <div class="stat-card" style="border-left-color:var(--pink)"><div class="stat-label">Extras</div><div class="stat-value" id="stat-extras">—</div></div>
+            <div class="stat-card" style="border-left-color:#FFC107"><div class="stat-label">Add On</div><div class="stat-value" id="stat-addon">—</div></div>
+        </div>
+
+        <!-- ── SALES BANNER MANAGER ── -->
+        <div class="sale-manager-card" id="sale-manager-card">
+            <div class="sale-card-header">
+                <div class="sale-card-title-wrap">
+                    <div class="sale-badge-icon">🔥</div>
+                    <div>
+                        <div class="sale-card-title">Top Banner Sale Manager</div>
+                        <div class="sale-card-subtitle">Choose a product, set the discounted price, and update the live sales banner at the top of the website</div>
+                    </div>
+                </div>
+                <div class="sale-status-badge inactive" id="sale-status-badge">
+                    <i data-lucide="circle-slash" id="sale-status-icon" style="width:13px;height:13px"></i>
+                    <span id="sale-status-badge-text">Banner Inactive</span>
+                </div>
+            </div>
+
+            <!-- Live Banner Preview -->
+            <div class="sale-preview-container">
+                <div class="sale-preview-title">
+                    <span>Live Banner Preview</span>
+                    <span id="sale-preview-status-hint" style="color:var(--muted);font-weight:400;text-transform:none">Changes appear here in real-time</span>
+                </div>
+                <div class="admin-live-banner" id="admin-live-banner">
+                    <div class="alb-left">
+                        <span class="alb-badge" id="alb-badge">FLASH SALE</span>
+                        <div class="alb-info">
+                            <span class="alb-name" id="alb-name">Select a product</span>
+                            <span style="color:var(--muted)">on sale for</span>
+                            <span class="alb-price" id="alb-price">$0</span>
+                            <span class="alb-old" id="alb-old">$0</span>
+                            <span class="alb-save" id="alb-save">Save $0</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="alb-btn">Shop Deal →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sale Form Controls -->
+            <form id="sale-form">
+                <div class="sale-form-grid">
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Select Product *</label>
+                        <select class="form-select form-input" id="sale-product-select" required>
+                            <option value="">-- Choose a Product --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Regular Price</label>
+                        <input class="form-input" type="text" id="sale-original-price" readonly placeholder="$0" style="opacity:0.7;cursor:not-allowed">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Discounted Price ($) *</label>
+                        <input class="form-input" type="number" id="sale-discounted-price" min="0" step="0.01" placeholder="e.g. 18" required>
+                        <div class="sale-calc-pill" id="sale-calc-pill"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Banner Tagline</label>
+                        <input class="form-input" type="text" id="sale-tagline" placeholder="e.g. FLASH SALE, WEEKEND DEAL">
+                    </div>
+                </div>
+
+                <div class="sale-actions-row">
+                    <div style="display:flex;align-items:center;gap:0.75rem">
+                        <label style="display:inline-flex;align-items:center;gap:0.45rem;cursor:pointer;font-size:0.85rem;font-weight:600">
+                            <input type="checkbox" id="sale-active-checkbox" checked style="accent-color:var(--red);width:16px;height:16px;cursor:pointer">
+                            <span>Enable Sale Banner on Website</span>
+                        </label>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.75rem">
+                        <button type="button" class="btn btn-ghost" id="sale-deactivate-btn" style="color:var(--danger);border-color:rgba(239,68,68,0.3)">
+                            <i data-lucide="eye-off" style="width:14px;height:14px"></i> Deactivate Banner
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="sale-save-btn" style="background:var(--red);border:1.5px solid #FFC107">
+                            <i data-lucide="sparkles" style="width:15px;height:15px;color:#FFC107"></i> Update Top Banner Sale
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <!-- Toolbar -->
@@ -350,6 +640,7 @@
                     <button class="pill" data-cat="Flower">Flower</button>
                     <button class="pill" data-cat="Vapes">Vapes</button>
                     <button class="pill" data-cat="Extras">Extras</button>
+                    <button class="pill" data-cat="Add On">Add On</button>
                 </div>
             </div>
             <button class="btn btn-primary" id="add-btn">
@@ -410,6 +701,7 @@
                         <option value="Flower">Flower</option>
                         <option value="Vapes">Vapes</option>
                         <option value="Extras">Extras</option>
+                        <option value="Add On">Add On</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -517,18 +809,87 @@ document.getElementById('login-pass').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('login-btn').click();
 });
 
+async function checkCloudStatus() {
+    const pill = document.getElementById('cloud-status-pill');
+    const dot = document.getElementById('cloud-dot');
+    const text = document.getElementById('cloud-text');
+    if (!pill) return;
+
+    try {
+        const res = await api('GET', '/api/supabase/status');
+        if (res.connected) {
+            dot.style.background = '#4ade80';
+            text.textContent = 'Supabase Pro Active';
+            text.style.color = '#4ade80';
+            const banner = document.getElementById('quota-warning-banner');
+            if (banner) banner.classList.add('hidden');
+        } else if (res.error && res.error.includes('exceed_egress_quota')) {
+            dot.style.background = '#f59e0b';
+            text.textContent = 'Quota Restricted';
+            text.style.color = '#f59e0b';
+            const banner = document.getElementById('quota-warning-banner');
+            if (banner) banner.classList.remove('hidden');
+        } else {
+            dot.style.background = '#94a3b8';
+            text.textContent = 'Local File Mode';
+            text.style.color = 'var(--muted)';
+        }
+    } catch {
+        dot.style.background = '#94a3b8';
+        text.textContent = 'Local File Mode';
+    }
+}
+
+async function triggerSupabaseSync() {
+    const btn = document.getElementById('sync-cloud-btn');
+    const label = document.getElementById('sync-btn-label');
+    const oldText = label ? label.textContent : '';
+    if (label) label.textContent = 'Syncing…';
+    if (btn) btn.disabled = true;
+
+    try {
+        const res = await api('POST', '/api/supabase/sync');
+        toast(res.message || 'Synced to Supabase Pro successfully!');
+        const banner = document.getElementById('quota-warning-banner');
+        if (banner) banner.classList.add('hidden');
+        await checkCloudStatus();
+        await loadProducts();
+    } catch (err) {
+        toast('Sync error: ' + err.message, 'error');
+        await checkCloudStatus();
+    } finally {
+        if (label) label.textContent = oldText;
+        if (btn) btn.disabled = false;
+        if (window.lucide) lucide.createIcons();
+    }
+}
+
+document.getElementById('sync-cloud-btn').addEventListener('click', triggerSupabaseSync);
+document.getElementById('banner-reconnect-btn').addEventListener('click', triggerSupabaseSync);
+
+function checkQuotaStatus(s) {
+    if (s && s.supabaseQuotaExceeded) {
+        const banner = document.getElementById('quota-warning-banner');
+        if (banner) banner.classList.remove('hidden');
+    }
+}
+
 document.getElementById('login-btn').addEventListener('click', async () => {
-    const u = document.getElementById('login-user').value.trim();
-    const p = document.getElementById('login-pass').value;
+    const u = (document.getElementById('login-user').value || 'admin').trim();
+    const p = (document.getElementById('login-pass').value || '').trim();
     const err = document.getElementById('login-error');
     err.style.display = 'none';
     try {
         await api('POST', '/api/login', { username: u, password: p });
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+        const s = await api('GET', '/api/auth-status').catch(() => ({}));
+        checkQuotaStatus(s);
+        checkCloudStatus();
         loadProducts();
-    } catch {
+    } catch (e) {
         err.style.display = 'block';
+        err.textContent = e.message || 'Invalid username or password.';
     }
 });
 
@@ -543,6 +904,8 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
     if (s.authenticated) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+        checkQuotaStatus(s);
+        checkCloudStatus();
         loadProducts();
     }
 })();
@@ -553,8 +916,16 @@ async function loadProducts() {
         allProducts = await api('GET', '/api/products');
         renderStats();
         renderTable();
+        populateSaleProductDropdown();
+        await loadSale();
     } catch (e) {
-        toast('Failed to load products: ' + e.message, 'error');
+        console.error('Error loading products:', e);
+        if (e.message && e.message.includes('exceed_egress_quota')) {
+            const banner = document.getElementById('quota-warning-banner');
+            if (banner) banner.classList.remove('hidden');
+        } else {
+            toast('Failed to load products: ' + e.message, 'error');
+        }
     }
 }
 
@@ -563,6 +934,7 @@ function renderStats() {
     document.getElementById('stat-flower').textContent = allProducts.filter(p => p.category === 'Flower').length;
     document.getElementById('stat-vapes').textContent = allProducts.filter(p => p.category === 'Vapes').length;
     document.getElementById('stat-extras').textContent = allProducts.filter(p => p.category === 'Extras').length;
+    document.getElementById('stat-addon').textContent = allProducts.filter(p => p.category === 'Add On').length;
 }
 
 function renderTable() {
@@ -585,7 +957,7 @@ function renderTable() {
     emptyState.classList.add('hidden');
 
     tbody.innerHTML = filtered.map(p => {
-        const catClass = p.category === 'Flower' ? 'badge-flower' : p.category === 'Vapes' ? 'badge-vapes' : 'badge-extras';
+        const catClass = p.category === 'Flower' ? 'badge-flower' : p.category === 'Vapes' ? 'badge-vapes' : p.category === 'Add On' ? 'badge-addon' : 'badge-extras';
         const imgSrc = getMediaSrc(p.img) || PLACEHOLDER_IMG;
         const flavorCount = p.flavors ? Object.keys(p.flavors).length : 0;
         return `
@@ -600,6 +972,9 @@ function renderTable() {
             <td style="color:var(--muted);font-size:.82rem">${flavorCount > 0 ? flavorCount + ' flavors' : '—'}</td>
             <td>
                 <div class="action-btns">
+                    <button class="icon-btn sale" onclick="selectForSale(${p.id})" title="Feature on Top Banner Sale">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                    </button>
                     <button class="icon-btn edit" onclick="openEdit(${p.id})" title="Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </button>
@@ -838,6 +1213,222 @@ document.getElementById('confirm-delete').addEventListener('click', async () => 
         toast('Error: ' + err.message, 'error');
     }
 });
+
+// ── Top Banner Sale Management ────────────────────────────────────────────────
+let currentSale = null;
+
+async function loadSale() {
+    try {
+        currentSale = await api('GET', '/api/sale');
+        populateSaleProductDropdown();
+        applySaleToUI(currentSale);
+    } catch (e) {
+        console.warn('Failed to load sale:', e.message);
+    }
+}
+
+function populateSaleProductDropdown() {
+    const select = document.getElementById('sale-product-select');
+    if (!select) return;
+    const prevVal = select.value;
+    select.innerHTML = '<option value="">-- Choose a Product --</option>';
+
+    const sorted = [...allProducts].sort((a, b) => a.name.localeCompare(b.name));
+    sorted.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.name} ($${p.price}) — [${p.category}]`;
+        select.appendChild(opt);
+    });
+
+    if (prevVal) select.value = prevVal;
+}
+
+function applySaleToUI(sale) {
+    const statusBadge = document.getElementById('sale-status-badge');
+    const statusText = document.getElementById('sale-status-badge-text');
+    const previewHint = document.getElementById('sale-preview-status-hint');
+    const select = document.getElementById('sale-product-select');
+    const origInput = document.getElementById('sale-original-price');
+    const discInput = document.getElementById('sale-discounted-price');
+    const taglineInput = document.getElementById('sale-tagline');
+    const activeCheck = document.getElementById('sale-active-checkbox');
+
+    if (!select) return;
+
+    if (sale && sale.productId) {
+        select.value = sale.productId;
+        origInput.value = `$${sale.originalPrice}`;
+        discInput.value = sale.discountedPrice;
+        taglineInput.value = sale.tagline || 'FLASH SALE';
+        activeCheck.checked = sale.active !== false;
+
+        if (sale.active) {
+            statusBadge.className = 'sale-status-badge active';
+            statusText.textContent = 'Banner Active on Site';
+            previewHint.textContent = 'Banner is live on site';
+            previewHint.style.color = '#4ade80';
+        } else {
+            statusBadge.className = 'sale-status-badge inactive';
+            statusText.textContent = 'Banner Inactive';
+            previewHint.textContent = 'Banner is paused (not visible on site)';
+            previewHint.style.color = 'var(--muted)';
+        }
+    } else {
+        statusBadge.className = 'sale-status-badge inactive';
+        statusText.textContent = 'Banner Inactive';
+        previewHint.textContent = 'No active sale posted';
+        previewHint.style.color = 'var(--muted)';
+    }
+
+    updateSalePreview();
+    if (window.lucide) lucide.createIcons({ nodes: [statusBadge] });
+}
+
+function updateSalePreview() {
+    const select = document.getElementById('sale-product-select');
+    const discInput = document.getElementById('sale-discounted-price');
+    const taglineInput = document.getElementById('sale-tagline');
+    const calcPill = document.getElementById('sale-calc-pill');
+
+    const albBadge = document.getElementById('alb-badge');
+    const albName = document.getElementById('alb-name');
+    const albPrice = document.getElementById('alb-price');
+    const albOld = document.getElementById('alb-old');
+    const albSave = document.getElementById('alb-save');
+
+    if (!select) return;
+
+    const productId = parseInt(select.value);
+    const product = allProducts.find(p => p.id === productId);
+    const discountedPrice = parseFloat(discInput.value);
+    const tagline = taglineInput.value.trim() || 'FLASH SALE';
+
+    albBadge.textContent = tagline;
+
+    if (product) {
+        albName.textContent = product.name;
+        albOld.textContent = `$${product.price}`;
+        document.getElementById('sale-original-price').value = `$${product.price}`;
+
+        if (!isNaN(discountedPrice) && discountedPrice >= 0) {
+            albPrice.textContent = `$${discountedPrice}`;
+            const diff = product.price - discountedPrice;
+            if (diff > 0) {
+                const percent = Math.round((diff / product.price) * 100);
+                albSave.textContent = `Save $${diff.toFixed(2)} (${percent}% OFF)`;
+                albSave.style.display = 'inline-block';
+                calcPill.textContent = `Customer saves $${diff.toFixed(2)} (${percent}% OFF)`;
+                calcPill.style.color = '#4ade80';
+            } else if (diff === 0) {
+                albSave.style.display = 'none';
+                calcPill.textContent = 'Regular price (no discount)';
+                calcPill.style.color = 'var(--muted)';
+            } else {
+                albSave.style.display = 'none';
+                calcPill.textContent = 'Note: Discounted price is higher than regular price';
+                calcPill.style.color = '#f87171';
+            }
+        } else {
+            albPrice.textContent = `$${product.price}`;
+            albSave.style.display = 'none';
+            calcPill.textContent = '';
+        }
+    } else {
+        albName.textContent = 'Select a product';
+        albPrice.textContent = '$0';
+        albOld.textContent = '$0';
+        albSave.style.display = 'none';
+        calcPill.textContent = '';
+    }
+}
+
+document.getElementById('sale-product-select').addEventListener('change', () => {
+    const productId = parseInt(document.getElementById('sale-product-select').value);
+    const product = allProducts.find(p => p.id === productId);
+    if (product) {
+        document.getElementById('sale-original-price').value = `$${product.price}`;
+        const currentDisc = parseFloat(document.getElementById('sale-discounted-price').value);
+        if (!currentDisc || currentDisc >= product.price) {
+            document.getElementById('sale-discounted-price').value = Math.max(1, Math.round(product.price * 0.8));
+        }
+    } else {
+        document.getElementById('sale-original-price').value = '';
+    }
+    updateSalePreview();
+});
+
+document.getElementById('sale-discounted-price').addEventListener('input', updateSalePreview);
+document.getElementById('sale-tagline').addEventListener('input', updateSalePreview);
+document.getElementById('sale-active-checkbox').addEventListener('change', () => {
+    const isChecked = document.getElementById('sale-active-checkbox').checked;
+    const previewHint = document.getElementById('sale-preview-status-hint');
+    if (isChecked) {
+        previewHint.textContent = 'Banner will be published live on site';
+        previewHint.style.color = '#4ade80';
+    } else {
+        previewHint.textContent = 'Banner will be saved as paused/inactive';
+        previewHint.style.color = 'var(--muted)';
+    }
+});
+
+document.getElementById('sale-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('sale-save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Publishing…';
+
+    try {
+        const productId = document.getElementById('sale-product-select').value;
+        const discountedPrice = document.getElementById('sale-discounted-price').value;
+        const tagline = document.getElementById('sale-tagline').value.trim();
+        const active = document.getElementById('sale-active-checkbox').checked;
+
+        if (!productId) {
+            toast('Please select a product to put on sale', 'error');
+            return;
+        }
+
+        const res = await api('POST', '/api/sale', {
+            productId: parseInt(productId),
+            discountedPrice: parseFloat(discountedPrice),
+            tagline,
+            active
+        });
+
+        currentSale = res.sale;
+        applySaleToUI(currentSale);
+        toast(active ? '🔥 Sale posted & live at the top of the website!' : 'Sale saved (inactive)');
+    } catch (err) {
+        toast('Error saving sale: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="sparkles" style="width:15px;height:15px;color:#FFC107"></i> Update Top Banner Sale';
+        if (window.lucide) lucide.createIcons({ nodes: [btn] });
+    }
+});
+
+document.getElementById('sale-deactivate-btn').addEventListener('click', async () => {
+    try {
+        await api('DELETE', '/api/sale');
+        if (currentSale) currentSale.active = false;
+        document.getElementById('sale-active-checkbox').checked = false;
+        applySaleToUI(currentSale);
+        toast('Top sale banner deactivated.');
+    } catch (err) {
+        toast('Error: ' + err.message, 'error');
+    }
+});
+
+function selectForSale(productId) {
+    const select = document.getElementById('sale-product-select');
+    select.value = productId;
+    select.dispatchEvent(new Event('change'));
+    const managerCard = document.getElementById('sale-manager-card');
+    managerCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('sale-discounted-price').focus();
+    toast('Selected product for Top Sale Banner!');
+}
 
 // ── Init Icons ────────────────────────────────────────────────────────────────
 if (window.lucide) lucide.createIcons();

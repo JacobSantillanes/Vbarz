@@ -32,6 +32,34 @@
 
     <!-- MAIN CONTENT (Hidden until Age verified) -->
     <div id="main-content" class="hidden">
+        <!-- TOP SALES BANNER -->
+        <div id="sales-banner" class="sales-banner hidden">
+            <div class="sales-banner-container">
+                <div class="sales-banner-left">
+                    <span class="sales-banner-badge">
+                        <i data-lucide="flame" class="icon-flame"></i>
+                        <span id="banner-tagline">FLASH SALE</span>
+                    </span>
+                    <div class="sales-banner-info">
+                        <strong class="sales-product-name" id="banner-product-name">Product Name</strong>
+                        <span class="sales-on-sale-text">on sale for</span>
+                        <span class="sales-price" id="banner-sale-price">$0</span>
+                        <del class="sales-original-price" id="banner-original-price">$0</del>
+                        <span class="sales-save-pill" id="banner-save-pill">Save $0</span>
+                    </div>
+                </div>
+                <div class="sales-banner-right">
+                    <button class="sales-cta-btn" id="banner-cta-btn">
+                        <span>Shop Deal</span>
+                        <i data-lucide="arrow-right" class="icon-tiny"></i>
+                    </button>
+                    <button class="sales-close-btn" id="banner-close-btn" aria-label="Dismiss sale banner">
+                        <i data-lucide="x" class="icon-tiny"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- NAVBAR -->
         <nav class="navbar">
             <div class="nav-brand" onclick="window.scrollTo(0,0)">VBARZ</div>
@@ -87,10 +115,10 @@
                     Admin Access
                 </p>
                 <div id="admin-login-form">
-                    <input class="sidebar-input" type="text" id="sb-username" placeholder="Username"
-                        autocomplete="username">
+                    <input class="sidebar-input" type="text" id="sb-username" value="admin" placeholder="Username"
+                        autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
                     <input class="sidebar-input" type="password" id="sb-password" placeholder="Password"
-                        autocomplete="current-password">
+                        autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
                     <button class="sidebar-login-btn" id="sb-login-btn">
                         <i data-lucide="log-in" style="width:15px;height:15px"></i> Sign In to Dashboard
                     </button>
@@ -140,6 +168,7 @@
                         <button class="filter-btn" data-category="Flower">Flower</button>
                         <button class="filter-btn" data-category="Vapes">Carts/Disposables</button>
                         <button class="filter-btn" data-category="Extras">Extras</button>
+                        <button class="filter-btn" data-category="Add On">Add On</button>
                     </div>
                 </div>
 

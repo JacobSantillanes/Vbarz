@@ -341,8 +341,8 @@ const DEFAULT_PRODUCTS = [
     { id: 54, name: "3Stoogies *3 1.5 Flower .5 Rosin*", type: "Hybrid", category: "Extras", price: 35, prices: { "1 Hashole": 35, "Entire 3Pack": 90 }, img: "AC7FBDEC-A4B9-41F3-B26E-AEA64A3D616A.jpeg" },
     { id: 55, name: "Sourz 600Mg Gummies🍬", type: "Edibles", category: "Extras", price: 20, prices: { "1 qty": 20, "3 qty": 50, "5 qty": 75 }, img: "598BA7D1-5E55-4412-88C0-18018B4F45A2.jpeg" },
     { id: 56, name: "VBarz *750MG* 🥣", type: "Edibles", category: "Extras", price: 30, prices: { "1 qty": 30, "2 qty": 50, "5 qty": 100 }, img: "0CDD5D2B-C790-40BE-8A6E-916139ACFCCC.JPG" },
-    { id: 57, name: "Yocan Battery 🔋", type: "Battery", category: "Extras", price: 25, prices: { "1 qty": 25, "2 qty": 45, "5 qty": 100 }, img: "YocanKodoPro-Colors.webp" },
-    { id: 58, name: "PNP Battery", type: "Battery", category: "Extras", price: 35, prices: { "1 qty": 35, "4 qty": 100 }, img: "pp_blackbatt.webp" },
+    { id: 57, name: "Yocan Battery 🔋", type: "Battery", category: "Add On", price: 25, prices: { "1 qty": 25, "2 qty": 45, "5 qty": 100 }, img: "YocanKodoPro-Colors.webp" },
+    { id: 58, name: "PNP Battery", type: "Battery", category: "Add On", price: 35, prices: { "1 qty": 35, "4 qty": 100 }, img: "pp_blackbatt.webp" },
     {
         id: 59, name: "1g Flavorade Cartridge", type: "Cartridge", category: "Vapes", price: 50, prices: { "1 qty": 50, "2 qty": 90 }, img: "2d910a75cd35cedd29a43712dd50850f.jpg",
         flavors: {
@@ -380,6 +380,7 @@ function getMediaSrc(src) {
 }
 
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+let currentSale = null;
 
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -484,6 +485,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnYes.addEventListener('click', () => {
         ageGate.classList.add('hidden');
         mainContent.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+        updateBannerHeight();
     });
 
     btnNo.addEventListener('click', () => {
@@ -544,8 +547,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('sb-login-btn').addEventListener('click', async () => {
-        const username = document.getElementById('sb-username').value.trim();
-        const password = document.getElementById('sb-password').value;
+        const username = (document.getElementById('sb-username').value || 'admin').trim();
+        const password = document.getElementById('sb-password').value.trim();
         sbLoginError.classList.add('hidden');
         try {
             const res = await fetch('/api/login', {
@@ -574,6 +577,111 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('sb-password').value = '';
     });
 
+    // ── Sales Banner Logic ───────────────────────────────────────────────────
+    const salesBanner = document.getElementById('sales-banner');
+    const bannerTagline = document.getElementById('banner-tagline');
+    const bannerProductName = document.getElementById('banner-product-name');
+    const bannerSalePrice = document.getElementById('banner-sale-price');
+    const bannerOriginalPrice = document.getElementById('banner-original-price');
+    const bannerSavePill = document.getElementById('banner-save-pill');
+    const bannerCtaBtn = document.getElementById('banner-cta-btn');
+    const bannerCloseBtn = document.getElementById('banner-close-btn');
+
+    const updateBannerHeight = () => {
+        if (!salesBanner || salesBanner.classList.contains('hidden') || mainContent.classList.contains('hidden')) {
+            document.documentElement.style.setProperty('--sales-banner-height', '0px');
+            document.body.classList.remove('has-sales-banner');
+            return;
+        }
+        const h = salesBanner.offsetHeight;
+        document.documentElement.style.setProperty('--sales-banner-height', `${h}px`);
+        document.body.classList.add('has-sales-banner');
+    };
+
+    window.addEventListener('resize', () => {
+        if (salesBanner && !salesBanner.classList.contains('hidden')) {
+            updateBannerHeight();
+        }
+    });
+
+    const initSaleBanner = async () => {
+        try {
+            const res = await fetch('/api/sale');
+            if (!res.ok) return;
+            const sale = await res.json();
+            if (sale && sale.active && sale.productId) {
+                currentSale = sale;
+                if (bannerTagline) bannerTagline.textContent = sale.tagline || 'FLASH SALE';
+                if (bannerProductName) bannerProductName.textContent = sale.productName || 'Special Item';
+                if (bannerSalePrice) bannerSalePrice.textContent = `$${sale.discountedPrice}`;
+                if (bannerOriginalPrice) bannerOriginalPrice.textContent = `$${sale.originalPrice}`;
+
+                const savings = sale.originalPrice - sale.discountedPrice;
+                if (bannerSavePill) {
+                    if (savings > 0) {
+                        bannerSavePill.textContent = `Save $${savings}!`;
+                        bannerSavePill.style.display = 'inline-block';
+                    } else {
+                        bannerSavePill.style.display = 'none';
+                    }
+                }
+
+                salesBanner.classList.remove('hidden');
+                if (window.lucide) window.lucide.createIcons();
+                requestAnimationFrame(() => updateBannerHeight());
+            } else {
+                currentSale = null;
+                salesBanner.classList.add('hidden');
+                updateBannerHeight();
+            }
+        } catch {
+            // Keep default/fallback state
+        }
+    };
+
+    if (bannerCloseBtn) {
+        bannerCloseBtn.addEventListener('click', () => {
+            salesBanner.classList.add('banner-exit');
+            setTimeout(() => {
+                salesBanner.classList.add('hidden');
+                salesBanner.classList.remove('banner-exit');
+                updateBannerHeight();
+            }, 280);
+        });
+    }
+
+    if (bannerCtaBtn) {
+        bannerCtaBtn.addEventListener('click', () => {
+            if (!currentSale) return;
+            const activeFilter = document.querySelector('.filter-btn.active');
+            const currentFilterCat = activeFilter ? activeFilter.getAttribute('data-category') : 'All';
+            const targetProduct = PRODUCTS.find(p => p.id === currentSale.productId);
+
+            if (targetProduct && currentFilterCat !== 'All' && targetProduct.category !== currentFilterCat) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                const allBtn = document.querySelector('.filter-btn[data-category="All"]');
+                if (allBtn) allBtn.classList.add('active');
+                renderProducts('All');
+            }
+
+            const menuEl = document.getElementById('menu');
+            if (menuEl) {
+                menuEl.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            setTimeout(() => {
+                const productCard = document.querySelector(`.btn-add[data-id="${currentSale.productId}"]`)?.closest('.product-card');
+                if (productCard) {
+                    productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    productCard.classList.remove('deal-spotlight');
+                    void productCard.offsetWidth; // retrigger CSS animation
+                    productCard.classList.add('deal-spotlight');
+                    setTimeout(() => productCard.classList.remove('deal-spotlight'), 3500);
+                }
+            }, 350);
+        });
+    }
+
     // Render Products
     const renderProducts = (category = 'All') => {
         productsContainer.innerHTML = '';
@@ -583,6 +691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             : PRODUCTS.filter(p => p.category === category);
 
         filteredProducts.forEach(product => {
+            const isProductOnSale = currentSale && currentSale.active && product.id === currentSale.productId;
             const badgeClass = product.type === 'Indica' ? 'badge-indica'
                 : product.type === 'Sativa' ? 'badge-sativa'
                     : 'badge-hybrid';
@@ -623,14 +732,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             const imgSrc = getMediaSrc(product.img) || PLACEHOLDER_IMG;
             const card = document.createElement('div');
             card.className = 'product-card';
+
+            const priceHtml = isProductOnSale
+                ? `<span class="product-price is-on-sale" data-base-price="${currentSale.discountedPrice}">$${currentSale.discountedPrice} <del class="product-card-del-price">$${product.price}</del></span>`
+                : `<span class="product-price" data-base-price="${product.price}">$${product.price}</span>`;
+
             card.innerHTML = `
                 <div class="product-image-container">
                     <img src="${imgSrc}" alt="${product.name}" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
                     <span class="product-badge ${badgeClass}">${product.type}</span>
+                    ${isProductOnSale ? `<span class="product-badge badge-sale">🔥 ON SALE</span>` : ''}
                 </div>
                 <h3 class="product-name">${product.name}</h3>
                 <div class="product-details">
-                    <span class="product-price" data-base-price="${product.price}">$${product.price}</span>
+                    ${priceHtml}
                     ${product.priceRange ? `<div class="product-price-range">${product.priceRange}</div>` : ''}
                 </div>
                 ${quantitySelector}
@@ -695,6 +810,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             itemToAdd.price = product.prices[qty];
                         }
                     }
+                } else if (currentSale && currentSale.active && product.id === currentSale.productId) {
+                    itemToAdd.price = currentSale.discountedPrice;
                 }
 
                 if (product.flavors) {
@@ -749,6 +866,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         PRODUCTS = DEFAULT_PRODUCTS;
     }
 
+    await initSaleBanner();
     renderProducts();
 
 });

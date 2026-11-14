@@ -164,10 +164,211 @@ body {
     text-transform: uppercase;
 }
 
+/* --- TOP SALES BANNER --- */
+:root {
+    --sales-banner-height: 0px;
+}
+
+body.has-sales-banner {
+    --sales-banner-height: 46px;
+}
+
+.sales-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 60;
+    background: linear-gradient(90deg, #090C14 0%, #1a0810 25%, #2a0b16 50%, #1a0810 75%, #090C14 100%);
+    border-bottom: 2px solid var(--primary-yellow);
+    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.25), 0 2px 8px rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 0.5rem 1.25rem;
+    font-family: 'Inter', sans-serif;
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.sales-banner.banner-exit {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.sales-banner-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sales-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.sales-banner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--primary-red);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.55rem;
+    border: 1.5px solid var(--primary-yellow);
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+    border-radius: 2px;
+}
+
+.sales-banner-badge .icon-flame {
+    width: 13px;
+    height: 13px;
+    color: var(--primary-yellow);
+    animation: flamePulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes flamePulse {
+    0% { transform: scale(0.9); opacity: 0.85; }
+    100% { transform: scale(1.15); opacity: 1; }
+}
+
+.sales-banner-info {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-size: 0.88rem;
+    flex-wrap: wrap;
+}
+
+.sales-product-name {
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.02em;
+}
+
+.sales-on-sale-text {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.82rem;
+}
+
+.sales-price {
+    font-weight: 900;
+    color: var(--primary-yellow);
+    font-size: 1.08rem;
+    text-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+}
+
+.sales-original-price {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.82rem;
+    text-decoration: line-through;
+}
+
+.sales-save-pill {
+    background: rgba(34, 197, 94, 0.18);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+}
+
+.sales-banner-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.sales-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--primary-yellow);
+    color: #000;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.8rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+    white-space: nowrap;
+}
+
+.sales-cta-btn:hover {
+    background: #ffe066;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+.sales-cta-btn:active {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.sales-cta-btn .icon-tiny {
+    width: 13px;
+    height: 13px;
+}
+
+.sales-close-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.sales-close-btn:hover {
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.sales-close-btn .icon-tiny {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 680px) {
+    body.has-sales-banner {
+        --sales-banner-height: 72px;
+    }
+    .sales-banner-container {
+        justify-content: center;
+        gap: 0.4rem;
+    }
+    .sales-banner-left {
+        justify-content: center;
+        text-align: center;
+        gap: 0.35rem;
+    }
+    .sales-banner-info {
+        justify-content: center;
+        font-size: 0.82rem;
+    }
+}
+
 /* --- NAVBAR --- */
 .navbar {
     position: fixed;
-    top: 0;
+    top: var(--sales-banner-height, 0px);
     width: 100%;
     z-index: 50;
     background-color: rgba(11, 14, 20, 0.9);
@@ -177,6 +378,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: top 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-brand {
@@ -448,8 +650,9 @@ body {
 /* --- HERO --- */
 .hero {
     position: relative;
-    padding: 8rem 1.5rem 5rem 1.5rem;
+    padding: calc(8rem + var(--sales-banner-height, 0px)) 1.5rem 5rem 1.5rem;
     overflow: hidden;
+    transition: padding-top 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-glow {
@@ -769,6 +972,40 @@ body {
 
 .badge-hybrid {
     background-color: var(--primary-yellow);
+    color: #000;
+}
+
+.badge-sale {
+    background: var(--primary-yellow) !important;
+    color: #000 !important;
+    font-weight: 900 !important;
+    border: 1px solid #000;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    margin-left: 0.25rem;
+}
+
+.product-price.is-on-sale {
+    color: var(--primary-red);
+    font-weight: 900;
+}
+
+.product-card-del-price {
+    font-size: 0.88rem;
+    color: #666;
+    text-decoration: line-through;
+    margin-left: 0.35rem;
+    font-weight: 500;
+}
+
+.product-card.deal-spotlight {
+    outline: 4px solid var(--primary-yellow) !important;
+    box-shadow: 0 0 35px rgba(255, 193, 7, 0.9), 10px 10px 0 var(--primary-red) !important;
+    animation: dealPulse 1s ease-in-out 3;
+}
+
+@keyframes dealPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
 }
 
 .product-name {

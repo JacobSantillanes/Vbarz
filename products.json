@@ -891,7 +891,7 @@
     "id": 57,
     "name": "Yocan Battery 🔋",
     "type": "Battery",
-    "category": "Extras",
+    "category": "Add On",
     "price": 25,
     "prices": {
       "1 qty": 25,
@@ -904,7 +904,7 @@
     "id": 58,
     "name": "PNP Battery",
     "type": "Battery",
-    "category": "Extras",
+    "category": "Add On",
     "price": 35,
     "prices": {
       "1 qty": 35,
